@@ -121,7 +121,7 @@
 <script>
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
-import { allSongs } from '../../common/data.js'
+import { allSongs, currentPlaySong } from '../../common/data.js'
 import drawerMixin from '../../common/drawerMixin.js'
 
 export default {
@@ -215,7 +215,10 @@ export default {
     /** 播放指定歌曲 → 全屏播放器 */
     playSong(item) {
       const song = allSongs.find(s => s.id === item.id)
-      if (song) uni.$emit('playSong', song)
+      if (song) {
+        currentPlaySong.song = song
+        uni.$emit('playSong', song)
+      }
       uni.navigateTo({ url: '/pages/player/index' })
     },
     /** 跳转歌单详情 */

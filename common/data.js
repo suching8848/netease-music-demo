@@ -147,10 +147,14 @@ export const myPlaylists = [
 ]
 
 export const playerInfo = {
+  id: 0,
   cover: '/static/images/player-cover.jpg',
   song: '游戏《Orzmic》第九章魔王曲',
   singer: 'CS4W'
 }
+
+// 跨页面共享的当前播放歌曲引用 — 解决 navigateTo 传参时序问题
+export const currentPlaySong = { song: null }
 
 // ============================================================
 // 全屏播放器 & 歌单详情 扩展数据

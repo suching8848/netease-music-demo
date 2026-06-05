@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { allSongs, playlistDetailMap } from '../../common/data.js'
+import { allSongs, playlistDetailMap, currentPlaySong } from '../../common/data.js'
 
 export default {
   data() {
@@ -109,12 +109,14 @@ export default {
     /** 播放全部 */
     playAll() {
       if (this.songs.length) {
+        currentPlaySong.song = this.songs[0]
         uni.$emit('playSong', this.songs[0])
         uni.navigateTo({ url: '/pages/player/index' })
       }
     },
     /** 播放指定歌曲 */
     playSong(song, index) {
+      currentPlaySong.song = song
       uni.$emit('playSong', song)
       uni.navigateTo({ url: '/pages/player/index' })
     }

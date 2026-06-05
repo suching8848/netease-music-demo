@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { playerInfo } from '../common/data.js'
+import { playerInfo, currentPlaySong } from '../common/data.js'
 
 export default {
   name: 'MiniPlayer',
@@ -55,6 +55,7 @@ export default {
       uni.$emit('playingChange', this.playing)
     },
     goFullPlayer() {
+      currentPlaySong.song = this.currentSong
       uni.$emit('playingChange', this.playing)
       uni.navigateTo({ url: '/pages/player/index' })
     },

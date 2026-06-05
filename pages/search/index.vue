@@ -119,8 +119,7 @@
 </template>
 
 <script>
-import { discoverIcons, quickDiscover, browseAll } from '../../common/data.js'
-import { allSongs } from '../../common/data.js'
+import { discoverIcons, quickDiscover, browseAll, allSongs, currentPlaySong } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
 import drawerMixin from '../../common/drawerMixin.js'
@@ -175,6 +174,7 @@ export default {
       this.searchResults = []
     },
     playSearchResult(song) {
+      currentPlaySong.song = song
       uni.$emit('playSong', song)
       uni.navigateTo({ url: '/pages/player/index' })
     },

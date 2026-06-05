@@ -84,14 +84,15 @@
 </template>
 
 <script>
-import { allSongs, mockLyrics } from '../../common/data.js'
+import { allSongs, mockLyrics, currentPlaySong } from '../../common/data.js'
 
 export default {
   data() {
     return {
       statusBarHeight: 44,
-      song: allSongs[0],
-      songIndex: 0,
+      song: currentPlaySong.song || allSongs[0],
+      songIndex: Math.max(0, allSongs.findIndex(s => s.id === (currentPlaySong.song || allSongs[0]).id)),
+      playing: false,
       playing: false,
       isLiked: false,
       currentTime: 0,
@@ -118,6 +119,16 @@ export default {
   onLoad() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
 
+    // 监听外部切歌
+    uni.$on('playSong', (song) => {
+      if (song && song.id) {
+        this.song = song
+        this.songIndex = Math.max(0, allSongs.findIndex(s => s.id === song.id))
+        this.currentTime = 0
+        this.playing = true
+        this.startTick()
+      }
+    })
     // 恢复迷你播放器传来的播放状态
     uni.$on('playingChange', (playing) => {
       if (typeof playing === 'boolean') {
