@@ -7,7 +7,6 @@
   <view
     v-if="showContent"
     class="drawer-root"
-    @touchmove.stop.prevent="preventBgScroll"
   >
     <!--
       全屏半透明遮罩层
@@ -17,7 +16,7 @@
     <view
       class="drawer-mask"
       :class="{ 'drawer-mask--on': animating }"
-      @tap="handleMaskTap"
+      @tap.stop="handleMaskTap"
     ></view>
 
     <!--
@@ -28,8 +27,6 @@
       class="drawer-panel"
       :class="{ 'drawer-panel--open': animating }"
       @tap.stop
-      @touchstart="handlePanelTouchStart"
-      @touchend="handlePanelTouchEnd"
       :style="{ paddingTop: statusBarHeight + 'px' }"
     >
       <!-- ========== 1. 顶部固定用户栏 ========== -->
@@ -314,10 +311,7 @@ export default {
     /** 打开抽屉 */
     open() {
       this.showContent = true
-      // 禁止背景页面滚动
-      this.lockBgScroll(true)
       this.$nextTick(() => {
-        // 触发 CSS transition
         this.animating = true
       })
     },
@@ -325,53 +319,15 @@ export default {
     /** 关闭抽屉 */
     close() {
       this.animating = false
-      // 恢复背景页面滚动
-      this.lockBgScroll(false)
       // 等待 CSS transition 结束 (280ms) 后再移除 DOM，避免闪烁
       setTimeout(() => {
         this.showContent = false
       }, 300)
     },
 
-    /** 禁止/恢复背景页面滚动 */
-    lockBgScroll(lock) {
-      // #ifdef H5
-      if (lock) {
-        document.body.style.overflow = 'hidden'
-      } else {
-        document.body.style.overflow = ''
-      }
-      // #endif
-    },
-
     /** 点击遮罩（右侧 20% 区域）→ 关闭 */
     handleMaskTap() {
       if (this.animating) {
-        this.$emit('input', false)
-      }
-    },
-
-    /** 阻止背景滚动事件穿透 */
-    preventBgScroll(e) {
-      // 在遮罩区域阻止滚动穿透
-      // scroll-view 内部滚动不受影响（组件自行处理）
-    },
-
-    /** 手势：记录触摸起始位置 */
-    handlePanelTouchStart(e) {
-      const touch = e.touches[0]
-      this.touchStartX = touch.clientX
-      this.touchStartY = touch.clientY
-    },
-
-    /** 手势：检测左滑关闭 */
-    handlePanelTouchEnd(e) {
-      const touch = e.changedTouches[0]
-      const deltaX = touch.clientX - this.touchStartX
-      const deltaY = Math.abs(touch.clientY - this.touchStartY)
-
-      // 仅在水平滑动为主、且向左滑动超过阈值时关闭
-      if (deltaX < -this.swipeThreshold && Math.abs(deltaX) > deltaY) {
         this.$emit('input', false)
       }
     },
