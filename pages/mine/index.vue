@@ -115,6 +115,7 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
+      showDrawer: false,
       profile,
       playlists: myPlaylists,
       loginUser: null

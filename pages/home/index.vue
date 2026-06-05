@@ -133,6 +133,7 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
+      showDrawer: false,
       currentTab: 1,
       tabs: ['心动', '推荐', '音乐', '会员大促', '播客'],
       topCards: [

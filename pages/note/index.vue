@@ -77,6 +77,7 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
+      showDrawer: false,
       leftList: [],
       rightList: []
     }

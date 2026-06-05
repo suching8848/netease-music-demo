@@ -134,6 +134,7 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
+      showDrawer: false,
       icons: discoverIcons,
       quickList: quickDiscover,
       browseList: browseAll,
