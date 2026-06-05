@@ -4,7 +4,8 @@
   点击左上角头像/菜单按钮即可打开抽屉
 -->
 <template>
-  <view class="page">
+  <view class="page-root">
+    <view class="page">
     <!-- 状态栏占位 (custom nav 模式需要) -->
     <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
@@ -50,19 +51,19 @@
       <view class="bottom-safe"></view>
     </scroll-view>
 
-    <!-- 公共组件：迷你播放器 + 底部导航栏 -->
     <mini-player></mini-player>
     <bottom-tab active="home"></bottom-tab>
-
-    <!-- ========== SideDrawer 抽屉菜单 ========== -->
-    <side-drawer
-      v-model="showDrawer"
-      @user-click="onUserClick"
-      @item-click="onMenuItemClick"
-      @setting-click="onSettingClick"
-      @more-click="onMoreClick"
-    />
   </view>
+
+  <!-- ========== SideDrawer 抽屉菜单 ========== -->
+  <side-drawer
+    v-model="showDrawer"
+    @user-click="onUserClick"
+    @item-click="onMenuItemClick"
+    @setting-click="onSettingClick"
+    @more-click="onMoreClick"
+  />
+</view>
 </template>
 
 <script>
@@ -89,7 +90,14 @@ export default {
   methods: {
     /** 打开抽屉 */
     openDrawer() {
-      this.showDrawer = true
+      if (this.showDrawer) {
+        this.showDrawer = false
+        this.$nextTick(() => {
+          this.showDrawer = true
+        })
+      } else {
+        this.showDrawer = true
+      }
     },
 
     onUserClick() {
@@ -138,9 +146,15 @@ export default {
 </script>
 
 <style scoped>
+.page-root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow: visible;
+  background: #665d5f;
+}
 .page {
   height: 100vh;
-  background: #665d5f;
   display: flex;
   flex-direction: column;
   overflow: hidden;

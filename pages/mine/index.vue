@@ -1,9 +1,12 @@
 <template>
-  <view class="page">
+  <view class="page-root">
+    <view class="page" :style="{ '--status-bar-height': statusBarPx }">
     <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
     <view class="top-bar">
-      <text class="icon left" @tap="openDrawer">☰</text>
+      <view class="left-menu" @tap.stop="openDrawer">
+        <text class="icon">☰</text>
+      </view>
       <text class="status-text">+ 添加状态</text>
       <view class="right-icons">
         <text class="icon">＋</text>
@@ -89,15 +92,54 @@
 
     <mini-player></mini-player>
     <bottom-tab active="mine"></bottom-tab>
-
-    <side-drawer
-      v-model="showDrawer"
-      @user-click="onUserClick"
-      @item-click="onDrawerItemClick"
-      @setting-click="onSettingClick"
-      @more-click="onMoreClick"
-    />
   </view>
+
+  <view v-if="showDrawer" class="drawer-root">
+    <view class="drawer-mask" :style="{ opacity: drawerActive ? 1 : 0 }" @tap.stop="handleDrawerMaskTap"></view>
+    <view class="drawer-panel" @tap.stop :style="{ transform: drawerActive ? 'translateX(0)' : 'translateX(-100%)', paddingTop: drawerStatusBarH + 'px' }">
+      <view class="drawer-top">
+        <view class="drawer-user-info" @tap="handleDrawerUserClick">
+          <image class="drawer-avatar" src="/static/avatar.png" mode="aspectFill" />
+          <view class="drawer-user-name-row"><text class="drawer-user-name">su_ching蘇清</text><text class="drawer-user-arrow">›</text></view>
+        </view>
+      </view>
+      <scroll-view class="drawer-scroll" scroll-y :show-scrollbar="false" enhanced>
+        <view class="drawer-svip">
+          <view class="drawer-svip-top">
+            <view class="drawer-svip-title-row"><text class="drawer-svip-icon">◆</text><text class="drawer-svip-title">黑胶 SVIP · 柒</text><text class="drawer-svip-arrow">›</text></view>
+            <view class="drawer-svip-btn">会员中心</view>
+          </view>
+          <view class="drawer-svip-sub">享专属数专、AI调音等30+权益</view>
+        </view>
+        <view class="drawer-banner">
+          <view class="drawer-banner-triangle"></view>
+          <view class="drawer-banner-body">
+            <view class="drawer-banner-left"><text class="drawer-banner-badge">SVIP</text><text class="drawer-banner-text">周年庆！ 免费天数已发放</text></view>
+            <text class="drawer-banner-action">立抢 ›</text>
+          </view>
+        </view>
+        <view class="drawer-menu-card">
+          <block v-for="item in drawerMenuItems" :key="item.key">
+            <view class="drawer-menu-item" @tap="handleDrawerItemClick(item)">
+              <view class="drawer-menu-left"><text class="drawer-menu-icon">{{ item.icon }}</text><text class="drawer-menu-title">{{ item.title }}</text></view>
+              <view class="drawer-menu-right">
+                <text v-if="item.badge" class="drawer-menu-badge">{{ item.badge }}</text>
+                <text v-else-if="item.subtitle" class="drawer-menu-subtitle">{{ item.subtitle }}</text>
+                <text v-else-if="item.arrow !== false" class="drawer-menu-arrow">›</text>
+              </view>
+            </view>
+            <view v-if="item.divider" class="drawer-menu-divider"></view>
+          </block>
+        </view>
+        <view class="drawer-scroll-spacer"></view>
+      </scroll-view>
+      <view class="drawer-bottom" :style="{ paddingBottom: drawerSafeBottom + 'px' }">
+        <view class="drawer-bottom-btn" @tap="handleDrawerSettingClick"><text class="drawer-bottom-icon">⚙</text><text class="drawer-bottom-text">设置</text></view>
+        <view class="drawer-bottom-btn" @tap="handleDrawerMoreClick"><text class="drawer-bottom-icon">⋯</text><text class="drawer-bottom-text">更多</text></view>
+      </view>
+    </view>
+  </view>
+</view>
 </template>
 
 <script>
@@ -115,6 +157,7 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
+      statusBarPx: '44px',
       showDrawer: false,
       profile,
       playlists: myPlaylists,
@@ -123,6 +166,7 @@ export default {
   },
   created() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+    this.statusBarPx = this.statusBarHeight + 'px'
   },
   onShow() {
     this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
@@ -131,9 +175,9 @@ export default {
     goSearch() {
       uni.reLaunch({ url: '/pages/search/index' })
     },
-    // 已在「我的」页，点用户区直接关闭抽屉即可
-    onUserClick() {
-      this.showDrawer = false
+    // 已在「我的」页，点用户区只关抽屉，不跳转
+    handleDrawerUserClick() {
+      this.closeDrawer()
     },
     goPlaylist(playlistId) {
       uni.navigateTo({ url: '/pages/playlist/index?playlistId=' + playlistId })
@@ -159,9 +203,15 @@ export default {
 </script>
 
 <style scoped>
+.page-root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(180deg, #5a5053 0%, #665D5F 30%, #4a4245 100%);
+}
 .page {
   height: 100vh;
-  background: linear-gradient(180deg, #5a5053 0%, #665D5F 30%, #4a4245 100%);
   overflow: hidden;
 }
 .top-bar {
@@ -174,6 +224,20 @@ export default {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
+.left-menu {
+  width: 88rpx;
+  height: 88rpx;
+  margin-left: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.left-menu:active {
+  opacity: 0.6;
+}
 .icon {
   color: #fff;
   font-size: 44rpx;
@@ -181,9 +245,6 @@ export default {
   transition: transform 0.15s;
 }
 .icon:active { transform: scale(0.85); }
-.left {
-  width: 120rpx;
-}
 .status-text {
   flex: 1;
   text-align: center;

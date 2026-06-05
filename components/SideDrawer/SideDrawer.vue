@@ -1,24 +1,24 @@
 <template>
   <!--
-    SideDrawer - 左侧滑出抽屉菜单  v2
-    使用 CSS animation 替代 transition，App 端可靠渲染
+    SideDrawer v7 — 父级 v-if 控制挂载/卸载
+    组件 mounted 时自动播放滑入动画，关闭时 emit close 让父级卸载
   -->
-  <view
-    v-if="showPanel"
-    class="drawer-root"
-    :class="{ 'drawer-out': isClosing }"
-  >
-    <!-- 全屏遮罩 — 点击右侧 20% 关闭 -->
+  <view class="drawer-root" style="position:fixed;left:0;right:0;top:0;bottom:0;z-index:2147483647;">
+    <!-- 全屏遮罩 -->
     <view
       class="drawer-mask"
+      :style="{ opacity: active ? 1 : 0 }"
       @tap.stop="handleMaskTap"
     ></view>
 
-    <!-- 抽屉面板 80vw -->
+    <!-- 抽屉面板 -->
     <view
       class="drawer-panel"
       @tap.stop
-      :style="{ paddingTop: statusBarHeight + 'px' }"
+      :style="{
+        transform: active ? 'translateX(0)' : 'translateX(-100%)',
+        paddingTop: statusBarHeight + 'px'
+      }"
     >
       <!-- 1. 顶部用户栏 -->
       <view class="drawer-top">
@@ -74,7 +74,7 @@
 
         <!-- C. 主菜单 -->
         <view class="menu-card">
-          <block v-for="(item, index) in menuItems" :key="item.key">
+          <block v-for="item in menuItems" :key="item.key">
             <view class="menu-item" @tap="handleItemClick(item)">
               <view class="menu-left">
                 <text class="menu-icon">{{ item.icon }}</text>
@@ -111,17 +111,13 @@
 <script>
 export default {
   name: 'SideDrawer',
-  props: {
-    value: { type: Boolean, default: false }
-  },
   data() {
     return {
-      showPanel: false,    // v-if 控制 — 每次挂载重播 animation
-      isClosing: false,    // 关闭动画中
+      active: false,          // 动画状态 — mounted 后置 true 触发入场
       statusBarHeight: 44,
       safeAreaBottom: 0,
       menuItems: [
-        { key: 'messages',  icon: '✉', title: '我的消息',   badge: '99+', divider: false, arrow: false },
+        { key: 'messages',  icon: '✉', title: '我的消息',   divider: false },
         { key: 'cloudbean', icon: '☁', title: '我的云贝',   subtitle: '你的60云贝待使用', divider: false, arrow: false },
         { key: 'dress',     icon: '♛', title: '装扮中心',   subtitle: '一只小白熊来咯！', divider: false, arrow: false },
         { key: 'creator',   icon: '✦', title: '创作者中心', divider: false },
@@ -135,46 +131,46 @@ export default {
       ]
     }
   },
-  watch: {
-    value(val) {
-      if (val) {
-        this.showPanel = true
-        this.isClosing = false
-      } else if (this.showPanel) {
-        // 播放关闭动画 → 动画结束后隐藏
-        this.isClosing = true
-        clearTimeout(this._closeTimer)
-        this._closeTimer = setTimeout(() => {
-          this.showPanel = false
-          this.isClosing = false
-        }, 280)
-      }
-    }
-  },
   created() {
+    uni.showToast({ title: 'SD created', icon: 'none', duration: 600 })
     const info = uni.getSystemInfoSync()
     this.statusBarHeight = info.statusBarHeight || 44
     const model = info.model || ''
     this.safeAreaBottom = (model.includes('iPhone') && info.safeAreaInsets)
       ? info.safeAreaInsets.bottom : 0
   },
-  beforeDestroy() {
-    clearTimeout(this._closeTimer)
+  mounted() {
+    uni.showToast({ title: 'SD mounted', icon: 'none', duration: 600 })
+    // 父级 v-if 挂载后，等一帧触发入场动画
+    setTimeout(() => {
+      this.active = true
+    }, 50)
   },
   methods: {
+    /** 关闭 → 先播出场动画，再通知父级卸载 */
+    close() {
+      this.active = false
+      setTimeout(() => {
+        this.$emit('close')
+      }, 320)
+    },
     handleMaskTap() {
-      this.$emit('input', false)
+      this.close()
     },
     handleUserClick() {
+      this.close()
       this.$emit('user-click')
     },
     handleItemClick(item) {
+      this.close()
       this.$emit('item-click', { key: item.key, title: item.title })
     },
     handleSettingClick() {
+      this.close()
       this.$emit('setting-click')
     },
     handleMoreClick() {
+      this.close()
       this.$emit('more-click')
     }
   }
@@ -182,45 +178,54 @@ export default {
 </script>
 
 <style scoped>
-/* === Root — 全屏覆盖，v-show 控制 === */
+/* [DEBUG] 右上角紫色圆点 — 看到说明组件已渲染 */
+.debug-dot {
+  position: fixed;
+  top: 20rpx; right: 20rpx;
+  width: 60rpx; height: 60rpx;
+  background: #ff00ff;
+  border-radius: 50%;
+  z-index: 2147483647;
+}
+
+/* === Root — 全屏覆盖 === */
 .drawer-root {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  z-index: 10000;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2147483647;
+  pointer-events: auto;
+  overflow: visible;
 }
 
-/* === Mask — 打开时淡入，关闭时淡出 === */
+/* === Mask === */
 .drawer-mask {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  left: 0; right: 0;
+  top: 0; bottom: 0;
+  z-index: 2147483646;
   background: rgba(0, 0, 0, 0.55);
-  animation: maskIn 280ms ease forwards;
+  opacity: 0;
+  transition: opacity 300ms ease;
 }
-.drawer-out .drawer-mask {
-  animation: maskOut 280ms ease forwards;
-}
-@keyframes maskIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes maskOut { from { opacity: 1; } to { opacity: 0; } }
 
-/* === Panel — 80vw，滑入/滑出 === */
+/* === Panel === */
 .drawer-panel {
   position: absolute;
   top: 0; left: 0;
-  width: 80vw; height: 100vh;
+  width: 600rpx;
+  height: 100%;
+  z-index: 2147483647;
   background: linear-gradient(180deg, #50484a 0%, #5c5456 20%, #4a4345 100%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: 12rpx 0 48rpx rgba(0, 0, 0, 0.35);
-  animation: panelIn 280ms ease forwards;
+  transform: translateX(-100%);
+  transition: transform 300ms ease;
 }
-.drawer-out .drawer-panel {
-  animation: panelOut 280ms ease forwards;
-}
-@keyframes panelIn  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
-@keyframes panelOut { from { transform: translateX(0); }     to { transform: translateX(-100%); } }
 
 /* === 顶部用户栏 === */
 .drawer-top {
@@ -239,22 +244,18 @@ export default {
 .user-arrow { color: rgba(255,255,255,0.5); font-size: 32rpx; margin-left: 6rpx; }
 .user-actions { display: flex; align-items: center; gap: 28rpx; flex-shrink: 0; }
 
-/* 麦克风图标 */
 .icon-mic { width: 36rpx; height: 48rpx; display: flex; flex-direction: column; align-items: center; }
 .mic-body { width: 22rpx; height: 26rpx; border: 2rpx solid rgba(255,255,255,0.8); border-radius: 11rpx 11rpx 0 0; border-bottom: none; }
 .mic-stand { width: 2rpx; height: 14rpx; background: rgba(255,255,255,0.8); margin-top: 2rpx; position: relative; }
 .mic-stand::after { content: ''; position: absolute; bottom: -2rpx; left: 50%; transform: translateX(-50%); width: 14rpx; height: 2rpx; background: rgba(255,255,255,0.8); }
 
-/* 扫码图标 */
 .icon-scan { width: 36rpx; height: 36rpx; }
 .scan-box { width: 100%; height: 100%; border: 2rpx solid rgba(255,255,255,0.8); border-radius: 4rpx; position: relative; }
 .scan-box::after { content: ''; position: absolute; top: 50%; left: 10%; width: 80%; height: 2rpx; background: rgba(255,255,255,0.5); }
 
-/* === 滚动区 === */
 .drawer-scroll { flex: 1; overflow-y: auto; }
 .scroll-bottom-spacer { height: 40rpx; }
 
-/* === SVIP 卡片 === */
 .svip-card { margin: 0 36rpx; padding: 28rpx 28rpx 24rpx; border-radius: 12rpx; background: linear-gradient(145deg, #fdf3d0 0%, #f3dc92 40%, #e6c87c 100%); }
 .svip-top { display: flex; justify-content: space-between; align-items: center; }
 .svip-title-row { display: flex; align-items: center; }
@@ -272,7 +273,6 @@ export default {
 .partner-text { font-size: 22rpx; color: #5c3d0a; }
 .svip-double { display: flex; align-items: center; color: #8b6f2e; font-size: 22rpx; }
 
-/* === 粉色活动横幅 === */
 .banner-card { margin: 0 36rpx; height: 106rpx; border-radius: 10rpx; background: #ffe0e5; position: relative; display: flex; align-items: center; padding: 0 24rpx; }
 .banner-triangle { position: absolute; top: -14rpx; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 16rpx solid transparent; border-right: 16rpx solid transparent; border-bottom: 16rpx solid #ffe0e5; }
 .banner-content { width: 100%; display: flex; align-items: center; justify-content: space-between; }
@@ -281,7 +281,6 @@ export default {
 .banner-text { color: #a02030; font-size: 24rpx; font-weight: 500; white-space: nowrap; }
 .banner-action { color: #c0392b; font-size: 24rpx; font-weight: 600; flex-shrink: 0; }
 
-/* === 菜单卡片 === */
 .menu-card { margin: 24rpx 36rpx 0; border-radius: 14rpx; background: rgba(255,255,255,0.07); overflow: hidden; box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.12); }
 .menu-item { height: 112rpx; display: flex; align-items: center; justify-content: space-between; padding: 0 28rpx; transition: background 0.12s; }
 .menu-item:active { background: rgba(255,255,255,0.05); }
@@ -294,7 +293,6 @@ export default {
 .menu-arrow { color: rgba(255,255,255,0.35); font-size: 30rpx; }
 .menu-divider { height: 2rpx; background: rgba(255,255,255,0.12); margin: 0 28rpx; }
 
-/* === 底部操作栏 === */
 .drawer-bottom { flex-shrink: 0; height: 132rpx; display: flex; align-items: center; justify-content: space-between; padding: 0 36rpx; background: #5c5c5c; }
 .bottom-btn { width: 278rpx; height: 96rpx; border-radius: 12rpx; background: rgba(255,255,255,0.10); display: flex; align-items: center; justify-content: center; }
 .bottom-btn:active { background: rgba(255,255,255,0.16); }

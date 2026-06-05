@@ -9,7 +9,7 @@
     >
       <!-- 激活指示条 -->
       <view v-if="active === item.key" class="active-bar"></view>
-      <text class="tab-icon">{{ item.icon }}</text>
+      <text class="tab-icon" :class="{ 'search-icon': item.key === 'search' }">{{ item.icon }}</text>
       <text class="tab-label">{{ item.label }}</text>
       <view v-if="item.dot && active !== item.key" class="red-dot"></view>
     </view>
@@ -113,6 +113,11 @@ export default {
   line-height: 1;
   margin-bottom: 4rpx;
   transition: transform 0.2s ease;
+}
+
+/* ⌕ 字符字形偏小，单独放大让四个图标视觉一致 */
+.search-icon {
+  font-size: 48rpx;
 }
 
 .tab-item.active .tab-icon {

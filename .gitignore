@@ -1,5 +1,6 @@
 # HBuilderX 构建产物
 unpackage/
+.hbuilderx/
 
 # 系统文件
 .DS_Store
