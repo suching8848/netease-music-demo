@@ -13,8 +13,8 @@
       <view class="search-box" :class="{ active: searching }" @tap="activateSearch">
         <text class="search-mark" @tap.stop="activateSearch">⌕</text>
         <input
+          v-show="searching"
           class="search-input"
-          :class="{ show: searching }"
           v-model="searchQuery"
           :focus="searchFocus"
           placeholder="搜索歌曲、歌手"
@@ -284,21 +284,11 @@ export default {
 }
 
 .search-input {
-  flex: 0;
-  width: 0;
+  flex: 1;
   height: 72rpx;
   color: #fff;
   font-size: 28rpx;
-  margin: 0;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.search-input.show {
-  flex: 1;
-  width: auto;
   margin: 0 8rpx;
-  opacity: 1;
 }
 
 .search-ph { color: rgba(255, 255, 255, 0.35); }

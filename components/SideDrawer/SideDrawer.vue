@@ -311,15 +311,16 @@ export default {
     /** 打开抽屉 */
     open() {
       this.showContent = true
-      this.$nextTick(() => {
+      // setTimeout 替代 $nextTick — App 端 webview 渲染时序更可靠
+      setTimeout(() => {
         this.animating = true
-      })
+      }, 30)
     },
 
     /** 关闭抽屉 */
     close() {
       this.animating = false
-      // 等待 CSS transition 结束 (280ms) 后再移除 DOM，避免闪烁
+      // 等待 CSS transition 结束 (280ms) 后再移除 DOM
       setTimeout(() => {
         this.showContent = false
       }, 300)
