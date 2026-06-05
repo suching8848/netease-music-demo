@@ -23,7 +23,7 @@
     </view>
 
     <!-- 播放列表入口 -->
-    <view class="list-btn">☰</view>
+    <view class="list-btn" @tap.stop="showQueue">☰</view>
 
     <!-- 播放中底部流光条 -->
     <view v-if="playing" class="active-bar"></view>
@@ -67,6 +67,9 @@ export default {
     },
     onTogglePlay(playing) {
       this.playing = playing
+    },
+    showQueue() {
+      uni.showToast({ title: '播放列表开发中', icon: 'none', duration: 1200 })
     }
   }
 }

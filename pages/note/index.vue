@@ -12,7 +12,7 @@
 
       <view class="icons">
         <text class="search" @tap="goSearch">⌕</text>
-        <text class="plus">＋</text>
+        <text class="plus" @tap="createNote">＋</text>
       </view>
     </view>
 
@@ -91,6 +91,9 @@ export default {
   methods: {
     goSearch() {
       uni.reLaunch({ url: '/pages/search/index' })
+    },
+    createNote() {
+      uni.showToast({ title: '发布笔记开发中', icon: 'none', duration: 1200 })
     }
   }
 }

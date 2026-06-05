@@ -60,7 +60,7 @@
         <view class="ctrl-btn" @tap="nextSong">
           <text>⏭</text>
         </view>
-        <view class="ctrl-btn">
+        <view class="ctrl-btn" @tap="showPlaylist">
           <text>☰</text>
         </view>
       </view>
@@ -93,7 +93,6 @@ export default {
       song: currentPlaySong.song || allSongs[0],
       songIndex: Math.max(0, allSongs.findIndex(s => s.id === (currentPlaySong.song || allSongs[0]).id)),
       playing: false,
-      playing: false,
       isLiked: false,
       currentTime: 0,
       duration: 240, // 秒
@@ -120,7 +119,17 @@ export default {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
 
     // 监听外部切歌
-    uni.$on('playSong', (song) => {
+    uni.$on('playSong', this._onPlaySong)
+    // 恢复迷你播放器传来的播放状态
+    uni.$on('playingChange', this._onPlayingChange)
+  },
+  onUnload() {
+    this.stopTick()
+    uni.$off('playSong', this._onPlaySong)
+    uni.$off('playingChange', this._onPlayingChange)
+  },
+  methods: {
+    _onPlaySong(song) {
       if (song && song.id) {
         this.song = song
         this.songIndex = Math.max(0, allSongs.findIndex(s => s.id === song.id))
@@ -128,20 +137,14 @@ export default {
         this.playing = true
         this.startTick()
       }
-    })
-    // 恢复迷你播放器传来的播放状态
-    uni.$on('playingChange', (playing) => {
+    },
+    _onPlayingChange(playing) {
       if (typeof playing === 'boolean') {
         this.playing = playing
         if (playing) this.startTick()
         else this.stopTick()
       }
-    })
-  },
-  onUnload() {
-    this.stopTick()
-  },
-  methods: {
+    },
     goBack() {
       // 把播放状态回传给迷你播放器
       uni.$emit('togglePlay', this.playing)
@@ -210,6 +213,9 @@ export default {
       }
     },
 
+    showPlaylist() {
+      uni.showToast({ title: '播放列表开发中', icon: 'none', duration: 1200 })
+    },
     formatTime(seconds) {
       const m = Math.floor(seconds / 60)
       const s = Math.floor(seconds % 60)

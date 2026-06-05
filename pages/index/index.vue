@@ -57,6 +57,7 @@
     <!-- ========== SideDrawer 抽屉菜单 ========== -->
     <side-drawer
       v-model="showDrawer"
+      @user-click="onUserClick"
       @item-click="onMenuItemClick"
       @setting-click="onSettingClick"
       @more-click="onMoreClick"
@@ -89,6 +90,11 @@ export default {
     /** 打开抽屉 */
     openDrawer() {
       this.showDrawer = true
+    },
+
+    onUserClick() {
+      this.showDrawer = false
+      uni.reLaunch({ url: '/pages/mine/index' })
     },
 
     /** 点击菜单项 */
