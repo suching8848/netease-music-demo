@@ -7,7 +7,7 @@
       <text class="status-text">+ 添加状态</text>
       <view class="right-icons">
         <text class="icon">＋</text>
-        <text class="icon search">⌕</text>
+        <text class="icon search" @tap="goSearch">⌕</text>
         <text class="icon">⋮</text>
       </view>
     </view>
@@ -127,6 +127,9 @@ export default {
     this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
   methods: {
+    goSearch() {
+      uni.reLaunch({ url: '/pages/search/index' })
+    },
     // 已在「我的」页，点用户区直接关闭抽屉即可
     onUserClick() {
       this.showDrawer = false

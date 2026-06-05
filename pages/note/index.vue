@@ -11,7 +11,7 @@
       </view>
 
       <view class="icons">
-        <text class="search">⌕</text>
+        <text class="search" @tap="goSearch">⌕</text>
         <text class="plus">＋</text>
       </view>
     </view>
@@ -87,6 +87,11 @@ export default {
   onLoad() {
     this.leftList = noteList.filter((item, index) => index % 2 === 0)
     this.rightList = noteList.filter((item, index) => index % 2 !== 0)
+  },
+  methods: {
+    goSearch() {
+      uni.reLaunch({ url: '/pages/search/index' })
+    }
   }
 }
 </script>

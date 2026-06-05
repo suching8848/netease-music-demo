@@ -22,7 +22,7 @@
         </view>
       </scroll-view>
 
-      <view class="search-icon">⌕</view>
+      <view class="search-icon" @tap="goSearch">⌕</view>
     </view>
 
     <!-- 首页内容 -->
@@ -213,6 +213,9 @@ export default {
   },
   methods: {
     /** 播放指定歌曲 → 全屏播放器 */
+    goSearch() {
+      uni.reLaunch({ url: '/pages/search/index' })
+    },
     playSong(item) {
       const song = allSongs.find(s => s.id === item.id)
       if (song) {
