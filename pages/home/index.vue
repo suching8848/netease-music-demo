@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <view class="top-nav">
       <view class="left-menu">
-        <text class="menu-icon">☰</text>
+        <text class="menu-icon" @tap="openDrawer">☰</text>
         <view class="badge">99+</view>
       </view>
 
@@ -104,20 +104,31 @@
 
     <!-- 底部导航 -->
     <bottom-tab active="home"></bottom-tab>
+
+    <side-drawer
+      v-model="showDrawer"
+      @user-click="onUserClick"
+      @item-click="onDrawerItemClick"
+      @setting-click="onSettingClick"
+      @more-click="onMoreClick"
+    />
   </view>
 </template>
 
 <script>
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
+import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
 
 export default {
   components: {
     MiniPlayer,
-    BottomTab
+    BottomTab,
+    SideDrawer
   },
   data() {
     return {
+      showDrawer: false,
       currentTab: 1,
       tabs: ['心动', '推荐', '音乐', '会员大促', '播客'],
       topCards: [
@@ -191,6 +202,31 @@ export default {
           className: 'list-green'
         }
       ]
+    }
+  },
+  onHide() {
+    this.showDrawer = false
+  },
+  methods: {
+    openDrawer() {
+      this.showDrawer = true
+    },
+    onUserClick() {
+      this.showDrawer = false
+      // 跳转到「我的」页面进行登入/登出操作
+      uni.reLaunch({ url: '/pages/mine/index' })
+    },
+    onDrawerItemClick(item) {
+      console.log('抽屉菜单点击:', item.key, item.title)
+      this.showDrawer = false
+    },
+    onSettingClick() {
+      console.log('设置点击')
+      this.showDrawer = false
+    },
+    onMoreClick() {
+      console.log('更多点击')
+      this.showDrawer = false
     }
   }
 }

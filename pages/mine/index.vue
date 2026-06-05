@@ -3,7 +3,7 @@
     <view class="status-bar"></view>
 
     <view class="top-bar">
-      <text class="icon left">☰</text>
+      <text class="icon left" @tap="openDrawer">☰</text>
       <text class="status-text">+ 添加状态</text>
       <view class="right-icons">
         <text class="icon">＋</text>
@@ -89,6 +89,14 @@
 
     <mini-player></mini-player>
     <bottom-tab active="mine"></bottom-tab>
+
+    <side-drawer
+      v-model="showDrawer"
+      @user-click="onUserClick"
+      @item-click="onDrawerItemClick"
+      @setting-click="onSettingClick"
+      @more-click="onMoreClick"
+    />
   </view>
 </template>
 
@@ -96,23 +104,49 @@
 import { profile, myPlaylists, LOGIN_KEY } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
+import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
 
 export default {
   components: {
     MiniPlayer,
-    BottomTab
+    BottomTab,
+    SideDrawer
   },
   data() {
     return {
       profile,
       playlists: myPlaylists,
-      loginUser: null
+      loginUser: null,
+      showDrawer: false
     }
   },
   onShow() {
     this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
+  onHide() {
+    // 页面离开时关闭抽屉，避免残留
+    this.showDrawer = false
+  },
   methods: {
+    openDrawer() {
+      this.showDrawer = true
+    },
+    onUserClick() {
+      // 已在「我的」页面，关闭抽屉即可（本页已有登入/登出功能）
+      this.showDrawer = false
+    },
+    onDrawerItemClick(item) {
+      console.log('抽屉菜单点击:', item.key, item.title)
+      this.showDrawer = false
+    },
+    onSettingClick() {
+      console.log('设置点击')
+      this.showDrawer = false
+    },
+    onMoreClick() {
+      console.log('更多点击')
+      this.showDrawer = false
+    },
     goLogin() {
       uni.navigateTo({ url: '/pages/login/index' })
     },

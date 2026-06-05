@@ -2,8 +2,8 @@
     "name" : "netease-music-demo",
     "appid" : "__UNI__305FB91",
     "description" : "仿网易云音乐风格课程作业最终版",
-    "versionName" : "1.0.0",
-    "versionCode" : "100",
+    "versionName" : "1.1.1",
+    "versionCode" : 102,
     "transformPx" : false,
     "app-plus" : {
         "usingComponents" : true,
@@ -64,5 +64,6 @@
         },
         "usingComponents" : true
     },
-    "h5" : {}
+    "h5" : {},
+    "vueVersion" : "2"
 }

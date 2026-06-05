@@ -23,26 +23,41 @@ There are no tests, no linters, and no build scripts.
 - **Styling**: Scoped CSS with `rpx` units (uni-app's responsive pixel unit, 750rpx = screen width)
 - **State**: Component-local `data()` + `uni.setStorageSync`/`uni.getStorageSync` for login persistence. No Vuex or Pinia.
 - **Routing**: File-based routing declared in `pages.json`. Navigation via `uni.navigateTo`, `uni.reLaunch`, `uni.navigateBack`. No Vue Router.
+- **Build output**: `unpackage/` — HBuilderX generated build artifacts (gitignored). Never edit these files directly.
 
 ## Architecture
 
 ```
 App.vue (root — lifecycle hooks + global CSS)
   └── main.js (Vue instantiation + mount)
-        └── pages.json (route table — 5 pages, all custom nav)
+        └── pages.json (route table — 6 pages, all custom nav)
               ├── pages/home/index.vue     首页 / Home
               ├── pages/search/index.vue   搜索 / Search & Discover
               ├── pages/note/index.vue     笔记 / Notes (waterfall)
               ├── pages/mine/index.vue     我的 / Profile
-              └── pages/login/index.vue    登录 / Login
+              ├── pages/login/index.vue    登录 / Login
+              └── pages/index/index.vue    演示 / SideDrawer demo
 ```
 
 **Shared components** (`components/`):
 - `bottom-tab.vue` — reusable bottom tab bar (accepts `active` prop: `"home"` | `"search"` | `"note"` | `"mine"`). Navigates via `uni.reLaunch`. Used by all four main pages.
-- `mini-player.vue` — fixed bottom mini player with spinning record animation. Used by all pages except login.
+- `mini-player.vue` — fixed bottom mini player with spinning record animation. Used by all pages except login. Note: song/artist text is currently hardcoded in the template (not driven by `playerInfo` from `data.js`).
+- `SideDrawer/SideDrawer.vue` — left-side slide-out drawer menu, 80vw wide, z-index 10000 (above mini-player and bottom-tab). Supports `v-model` for open/close, left-swipe gesture to dismiss, and emits `item-click`/`setting-click`/`more-click`. Includes SVIP card, activity banner, and scrollable menu items. Used by `pages/index/index.vue`.
+
+**Custom navigation pattern**: All pages set `navigationStyle: "custom"` in `pages.json`, so every page implements its own status bar (`<view class="status-bar">`) and header/nav bar. There is no shared nav component — each page repeats this pattern.
+
+**Page layout convention**: Every main page follows the same stacking order:
+1. Status bar placeholder (compensates for system status bar height)
+2. Page-specific top bar / header
+3. `<scroll-view>` with main content
+4. `<mini-player>` (fixed, z-index 9998)
+5. `<bottom-tab>` (fixed, z-index 9999, except on login page)
+6. `<side-drawer>` (fixed, z-index 10000, only on pages that use it)
+
+The login page is the only page that omits mini-player and bottom-tab.
 
 **Data layer** (`common/data.js`):
-Central mock data file exporting all constants used across pages: theme colors, home cards/songs/playlists, discover icons, note list, user profile, playlist data, and the `STUDENT` login credentials object. Also exports `LOGIN_KEY` (`'musicFinalLoginUser'`) — the storage key for login session persistence.
+Central mock data file exporting all constants used across pages: `STUDENT` credentials, `LOGIN_KEY`, `theme` colors, `homeTabs`/`homeCards`/`recommendSongs`/`recommendPlaylists`, `discoverIcons`/`quickDiscover`/`browseAll`, `noteList`, `profile`, `myPlaylists`, and `playerInfo` (mini-player song metadata — currently unused by the component, which has hardcoded strings instead).
 
 **Login flow**:
 1. `mine/index.vue` checks `uni.getStorageSync(LOGIN_KEY)` on each `onShow`.
@@ -60,6 +75,7 @@ Central mock data file exporting all constants used across pages: theme colors, 
 | `App.vue` | Root component — global CSS reset, scrollbar hiding, box-model normalization |
 | `main.js` | Vue 2 entry point, no plugins or global config beyond `productionTip = false` |
 | `common/data.js` | All mock data and constants — the single source of truth for the entire app |
+| `components/SideDrawer/SideDrawer.vue` | Left-side drawer menu — highest z-index (10000), v-model driven, gesture-enabled |
 
 ## Styling conventions
 
@@ -73,6 +89,8 @@ Central mock data file exporting all constants used across pages: theme colors, 
 
 Defined in `common/data.js`:
 - 学号: `2312505051`, 姓名: `马望轩`, 密码: `123456`
+
+To customize for a different student, edit the `STUDENT` object's `id`, `name`, and `password` fields. The login page has a "一键填入测试账号" button that fills the form from `STUDENT`.
 
 ## Static assets
 

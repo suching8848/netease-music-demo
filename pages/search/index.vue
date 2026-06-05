@@ -4,7 +4,7 @@
 
     <view class="search-top">
       <view class="left-menu">
-        <text class="menu-icon">☰</text>
+        <text class="menu-icon" @tap="openDrawer">☰</text>
         <view class="badge">99+</view>
       </view>
 
@@ -57,6 +57,14 @@
 
     <mini-player></mini-player>
     <bottom-tab active="search"></bottom-tab>
+
+    <side-drawer
+      v-model="showDrawer"
+      @user-click="onUserClick"
+      @item-click="onDrawerItemClick"
+      @setting-click="onSettingClick"
+      @more-click="onMoreClick"
+    />
   </view>
 </template>
 
@@ -64,17 +72,44 @@
 import { discoverIcons, quickDiscover, browseAll } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
+import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
 
 export default {
   components: {
     MiniPlayer,
-    BottomTab
+    BottomTab,
+    SideDrawer
   },
   data() {
     return {
+      showDrawer: false,
       icons: discoverIcons,
       quickList: quickDiscover,
       browseList: browseAll
+    }
+  },
+  onHide() {
+    this.showDrawer = false
+  },
+  methods: {
+    openDrawer() {
+      this.showDrawer = true
+    },
+    onUserClick() {
+      this.showDrawer = false
+      uni.reLaunch({ url: '/pages/mine/index' })
+    },
+    onDrawerItemClick(item) {
+      console.log('抽屉菜单点击:', item.key, item.title)
+      this.showDrawer = false
+    },
+    onSettingClick() {
+      console.log('设置点击')
+      this.showDrawer = false
+    },
+    onMoreClick() {
+      console.log('更多点击')
+      this.showDrawer = false
     }
   }
 }

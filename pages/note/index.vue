@@ -3,7 +3,7 @@
     <view class="status-bar"></view>
 
     <view class="note-top">
-      <view class="menu">☰</view>
+      <view class="menu" @tap="openDrawer">☰</view>
 
       <view class="tabs">
         <view class="tab follow">关注</view>
@@ -51,6 +51,14 @@
     <view class="feedback">✎ 意见反馈</view>
     <mini-player></mini-player>
     <bottom-tab active="note"></bottom-tab>
+
+    <side-drawer
+      v-model="showDrawer"
+      @user-click="onUserClick"
+      @item-click="onDrawerItemClick"
+      @setting-click="onSettingClick"
+      @more-click="onMoreClick"
+    />
   </view>
 </template>
 
@@ -58,14 +66,17 @@
 import { noteList } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
+import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
 
 export default {
   components: {
     MiniPlayer,
-    BottomTab
+    BottomTab,
+    SideDrawer
   },
   data() {
     return {
+      showDrawer: false,
       leftList: [],
       rightList: []
     }
@@ -73,6 +84,30 @@ export default {
   onLoad() {
     this.leftList = noteList.filter((item, index) => index % 2 === 0)
     this.rightList = noteList.filter((item, index) => index % 2 !== 0)
+  },
+  onHide() {
+    this.showDrawer = false
+  },
+  methods: {
+    openDrawer() {
+      this.showDrawer = true
+    },
+    onUserClick() {
+      this.showDrawer = false
+      uni.reLaunch({ url: '/pages/mine/index' })
+    },
+    onDrawerItemClick(item) {
+      console.log('抽屉菜单点击:', item.key, item.title)
+      this.showDrawer = false
+    },
+    onSettingClick() {
+      console.log('设置点击')
+      this.showDrawer = false
+    },
+    onMoreClick() {
+      console.log('更多点击')
+      this.showDrawer = false
+    }
   }
 }
 </script>
