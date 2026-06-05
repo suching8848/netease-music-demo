@@ -9,21 +9,22 @@
         <view class="badge">99+</view>
       </view>
 
-      <!-- 搜索框 — 点击激活输入，激活后显示真实 input -->
+      <!-- 搜索框 — 点击任意位置激活 -->
       <view class="search-box" :class="{ active: searching }" @tap="activateSearch">
-        <text class="search-mark">⌕</text>
+        <text class="search-mark" @tap.stop="activateSearch">⌕</text>
         <input
-          v-if="searching"
           class="search-input"
+          :class="{ show: searching }"
           v-model="searchQuery"
-          :focus="true"
+          :focus="searchFocus"
           placeholder="搜索歌曲、歌手"
           placeholder-class="search-ph"
           @input="onSearchInput"
+          @blur="onSearchBlur"
         />
-        <template v-else>
-          <text class="hot">!</text>
-          <text class="search-text">ぴーなた 新歌发布</text>
+        <template v-if="!searching">
+          <text class="hot" @tap.stop="activateSearch">!</text>
+          <text class="search-text" @tap.stop="activateSearch">ぴーなた 新歌发布</text>
         </template>
         <text class="scan" @tap.stop="toggleSearch">{{ searching ? '✕' : '⌗' }}</text>
       </view>
@@ -137,6 +138,7 @@ export default {
       quickList: quickDiscover,
       browseList: browseAll,
       searching: false,
+      searchFocus: false,
       searchQuery: '',
       searchResults: []
     }
@@ -148,6 +150,10 @@ export default {
     /* ====== 搜索逻辑 ====== */
     activateSearch() {
       this.searching = true
+      // 用 $nextTick 确保 input 已渲染后再聚焦，避免 App 端时序问题
+      this.$nextTick(() => {
+        this.searchFocus = true
+      })
     },
     toggleSearch(e) {
       if (this.searching) {
@@ -155,6 +161,10 @@ export default {
       } else {
         this.activateSearch()
       }
+    },
+    onSearchBlur() {
+      // input 失焦后重置 focus 标志
+      this.searchFocus = false
     },
     onSearchInput() {
       const q = this.searchQuery.trim().toLowerCase()
@@ -170,6 +180,7 @@ export default {
     },
     cancelSearch() {
       this.searching = false
+      this.searchFocus = false
       this.searchQuery = ''
       this.searchResults = []
     },
@@ -273,11 +284,21 @@ export default {
 }
 
 .search-input {
-  flex: 1;
+  flex: 0;
+  width: 0;
   height: 72rpx;
   color: #fff;
   font-size: 28rpx;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.search-input.show {
+  flex: 1;
+  width: auto;
   margin: 0 8rpx;
+  opacity: 1;
 }
 
 .search-ph { color: rgba(255, 255, 255, 0.35); }
