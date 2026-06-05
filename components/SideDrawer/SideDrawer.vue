@@ -4,7 +4,7 @@
     使用 CSS animation 替代 transition，App 端可靠渲染
   -->
   <view
-    v-show="showPanel"
+    v-if="showPanel"
     class="drawer-root"
     :class="{ 'drawer-out': isClosing }"
   >
@@ -116,7 +116,7 @@ export default {
   },
   data() {
     return {
-      showPanel: false,    // v-show 控制
+      showPanel: false,    // v-if 控制 — 每次挂载重播 animation
       isClosing: false,    // 关闭动画中
       statusBarHeight: 44,
       safeAreaBottom: 0,
