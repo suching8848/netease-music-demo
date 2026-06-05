@@ -1,11 +1,13 @@
 <template>
   <view class="page">
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-
-    <view class="top">
-      <view class="back" @tap="goBack">‹</view>
-      <view class="top-title">学生账号登录</view>
-      <view class="placeholder"></view>
+    <!-- 顶部导航区 — 状态栏 + 标题栏统一背景 -->
+    <view class="header-wrap">
+      <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
+      <view class="top">
+        <view class="back" @tap="goBack">‹</view>
+        <view class="top-title">学生账号登录</view>
+        <view class="placeholder"></view>
+      </view>
     </view>
 
     <view class="logo-box">
@@ -131,6 +133,16 @@ export default {
   background: linear-gradient(180deg, #5a5053 0%, #665D5F 40%, #4a4245 100%);
   padding: 0 40rpx;
 }
+
+/* 顶部导航区 — 状态栏 + 标题栏统一深色背景，消除割裂黑边 */
+.header-wrap {
+  margin: 0 -40rpx;
+  padding: 0 40rpx;
+  background: rgba(40, 35, 37, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 .top {
   height: 96rpx;
   display: flex;
