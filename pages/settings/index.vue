@@ -60,8 +60,9 @@
         </view>
       </view>
 
-      <!-- 退出登录 -->
-      <view class="logout-btn" @tap="handleLogout">退出登录</view>
+      <!-- 登录状态按钮 -->
+      <view v-if="isLogin" class="logout-btn" @tap="handleLogout">退出登录</view>
+      <view v-else class="login-btn" @tap="goLogin">去登录</view>
 
       <view class="bottom-safe"></view>
     </scroll-view>
@@ -75,13 +76,18 @@ export default {
   data() {
     return {
       statusBarHeight: 44,
-      cacheSize: '2.6 MB'
+      cacheSize: '2.6 MB',
+      isLogin: false
     }
   },
   onLoad() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+    this.isLogin = !!uni.getStorageSync(LOGIN_KEY)
   },
   methods: {
+    goLogin() {
+      uni.navigateTo({ url: '/pages/login/index' })
+    },
     goBack() { uni.navigateBack() },
     goProfile() {
       uni.reLaunch({ url: '/pages/mine/index' })
@@ -108,6 +114,7 @@ export default {
         success: (res) => {
           if (res.confirm) {
             uni.removeStorageSync(LOGIN_KEY)
+            this.isLogin = false
             uni.showToast({ title: '已退出登录', icon: 'none' })
             setTimeout(() => {
               uni.reLaunch({ url: '/pages/mine/index' })
@@ -218,6 +225,21 @@ export default {
 }
 
 .logout-btn:active { background: rgba(255, 45, 85, 0.22); }
+
+.login-btn {
+  margin: 60rpx 36rpx 0;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  background: linear-gradient(135deg, #ff2d55, #ff6b81);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(255, 45, 85, 0.3);
+}
+
+.login-btn:active { opacity: 0.8; }
 
 .bottom-safe { height: 80rpx; }
 </style>
