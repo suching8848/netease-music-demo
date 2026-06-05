@@ -271,7 +271,7 @@ export default {
 .hot {
   color: #ff2d55;
   font-size: 36rpx;
-  font-weight: 900;
+  font-weight: 700;
   margin-right: 14rpx;
 }
 
@@ -409,7 +409,7 @@ export default {
   background: rgba(255, 255, 255, 0.08);
   color: #e8cfcf;
   font-size: 46rpx;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .icon-name { margin-top: 10rpx; color: rgba(255, 255, 255, 0.7); font-size: 26rpx; }
@@ -418,7 +418,7 @@ export default {
   margin: 40rpx 36rpx 22rpx;
   color: #fff;
   font-size: 38rpx;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 1rpx;
 }
 
@@ -447,7 +447,7 @@ export default {
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
 }
 
-.quick-title { color: #fff; font-size: 30rpx; font-weight: 900; }
+.quick-title { color: #fff; font-size: 30rpx; font-weight: 700; }
 
 .quick-sub {
   margin-top: 6rpx;
@@ -492,7 +492,7 @@ export default {
 .grid-title {
   color: #fff;
   font-size: 32rpx;
-  font-weight: 900;
+  font-weight: 700;
   text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.3);
 }
 

@@ -215,7 +215,7 @@ export default {
 .playlist-name {
   color: #fff;
   font-size: 38rpx;
-  font-weight: 900;
+  font-weight: 700;
   margin-bottom: 16rpx;
 }
 

@@ -25,6 +25,9 @@ page {
   color: #F6F4F4;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.3rpx;
 }
 
 /* H5 浏览器 */

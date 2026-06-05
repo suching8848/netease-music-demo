@@ -158,7 +158,7 @@ export default {
   flex: 1;
   text-align: center;
   font-size: 32rpx;
-  font-weight: 800;
+  font-weight: 700;
 }
 .placeholder {
   width: 90rpx;
@@ -185,7 +185,7 @@ export default {
   margin-top: 30rpx;
   color: #fff;
   font-size: 52rpx;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 4rpx;
 }
 .sub {
@@ -254,7 +254,7 @@ export default {
   color: #fff;
   font-size: 32rpx;
   box-shadow: 0 8rpx 24rpx rgba(255, 45, 85, 0.35);
-  font-weight: 900;
+  font-weight: 700;
   text-align: center;
 }
 .demo {

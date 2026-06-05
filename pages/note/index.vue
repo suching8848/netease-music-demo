@@ -133,7 +133,7 @@ export default {
   margin: 0 34rpx;
   color: rgba(255,255,255,.45);
   font-size: 36rpx;
-  font-weight: 900;
+  font-weight: 700;
   position: relative;
   padding-bottom: 20rpx;
 }
@@ -213,7 +213,7 @@ export default {
 .note-title {
   color: #fff;
   font-size: 28rpx;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 40rpx;
 }
 .note-foot {

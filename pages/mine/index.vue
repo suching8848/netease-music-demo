@@ -224,7 +224,7 @@ export default {
 .name {
   color: #fff;
   font-size: 42rpx;
-  font-weight: 900;
+  font-weight: 700;
   margin-right: 16rpx;
 }
 .vip,
@@ -265,7 +265,7 @@ export default {
 }
 .num {
   font-size: 34rpx;
-  font-weight: 900;
+  font-weight: 700;
   margin-right: 8rpx;
 }
 .lab {
@@ -315,7 +315,7 @@ export default {
   line-height: 110rpx;
   color: rgba(255,255,255,.45);
   font-size: 36rpx;
-  font-weight: 900;
+  font-weight: 700;
   position: relative;
 }
 .top-tab.active {
@@ -345,7 +345,7 @@ export default {
 }
 .sub-tab.active {
   color: #fff;
-  font-weight: 900;
+  font-weight: 700;
 }
 .sub-tab text {
   font-size: 20rpx;
@@ -401,7 +401,7 @@ export default {
 .playlist-name {
   color: #fff;
   font-size: 32rpx;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

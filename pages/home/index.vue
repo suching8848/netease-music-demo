@@ -306,7 +306,7 @@ export default {
   line-height: 96rpx;
   margin: 0 22rpx;
   font-size: 38rpx;
-  font-weight: 900;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.5);
   position: relative;
   flex-shrink: 0;
@@ -443,7 +443,7 @@ export default {
   z-index: 2;
   margin-top: 120rpx;
   font-size: 42rpx;
-  font-weight: 900;
+  font-weight: 700;
   text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.2);
 }
 
@@ -453,7 +453,7 @@ export default {
   bottom: 34rpx;
   z-index: 2;
   font-size: 28rpx;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   white-space: nowrap;
 }
@@ -462,7 +462,7 @@ export default {
 .section-title {
   margin: 68rpx 46rpx 28rpx;
   font-size: 42rpx;
-  font-weight: 900;
+  font-weight: 700;
   color: #fff;
   letter-spacing: 1rpx;
 }
@@ -534,7 +534,7 @@ export default {
 
 .song-name {
   font-size: 34rpx;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
