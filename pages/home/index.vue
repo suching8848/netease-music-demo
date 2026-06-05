@@ -1,5 +1,6 @@
 <template>
   <view class="page">
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
     <!-- 顶部导航 -->
     <view class="top-nav">
       <view class="left-menu">
@@ -56,6 +57,7 @@
           class="song-item"
           v-for="item in songs"
           :key="item.id"
+          @tap="playSong(item)"
         >
           <view class="song-cover" :class="item.coverClass">
             <view class="small-disc"></view>
@@ -87,6 +89,7 @@
             class="playlist-card"
             v-for="item in playlists"
             :key="item.id"
+            @tap="goPlaylist(item.id)"
           >
             <view class="playlist-cover" :class="item.className">
               <view class="cover-disc"></view>
@@ -118,17 +121,18 @@
 <script>
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
-import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
+import { allSongs } from '../../common/data.js'
+import drawerMixin from '../../common/drawerMixin.js'
 
 export default {
+  mixins: [drawerMixin],
   components: {
     MiniPlayer,
-    BottomTab,
-    SideDrawer
+    BottomTab
   },
   data() {
     return {
-      showDrawer: false,
+      statusBarHeight: 44,
       currentTab: 1,
       tabs: ['心动', '推荐', '音乐', '会员大促', '播客'],
       topCards: [
@@ -204,29 +208,19 @@ export default {
       ]
     }
   },
-  onHide() {
-    this.showDrawer = false
+  created() {
+    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
   },
   methods: {
-    openDrawer() {
-      this.showDrawer = true
+    /** 播放指定歌曲 → 全屏播放器 */
+    playSong(item) {
+      const song = allSongs.find(s => s.id === item.id)
+      if (song) uni.$emit('playSong', song)
+      uni.navigateTo({ url: '/pages/player/index' })
     },
-    onUserClick() {
-      this.showDrawer = false
-      // 跳转到「我的」页面进行登入/登出操作
-      uni.reLaunch({ url: '/pages/mine/index' })
-    },
-    onDrawerItemClick(item) {
-      console.log('抽屉菜单点击:', item.key, item.title)
-      this.showDrawer = false
-    },
-    onSettingClick() {
-      console.log('设置点击')
-      this.showDrawer = false
-    },
-    onMoreClick() {
-      console.log('更多点击')
-      this.showDrawer = false
+    /** 跳转歌单详情 */
+    goPlaylist(playlistId) {
+      uni.navigateTo({ url: '/pages/playlist/index?playlistId=' + playlistId })
     }
   }
 }
@@ -235,21 +229,24 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #665D5F;
+  background: linear-gradient(180deg, #5a5053 0%, #665D5F 30%, #4a4245 100%);
   color: #fff;
   overflow-x: hidden;
 }
 
-/* 顶部导航 */
+/* 顶部导航 — 毛玻璃效果 */
 .top-nav {
   height: 96rpx;
   padding: 0 28rpx;
   display: flex;
   align-items: center;
-  background: #665D5F;
+  background: rgba(102, 93, 95, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 30;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.06);
 }
 
 .left-menu {
@@ -261,23 +258,27 @@ export default {
 }
 
 .menu-icon {
-  font-size: 56rpx;
+  font-size: 52rpx;
   color: #fff;
   line-height: 1;
+  transition: transform 0.15s;
 }
+
+.menu-icon:active { transform: scale(0.88); }
 
 .badge {
   position: absolute;
-  left: 30rpx;
-  top: 6rpx;
-  height: 32rpx;
-  line-height: 32rpx;
-  padding: 0 12rpx;
-  border-radius: 18rpx;
-  background: #ff1e3c;
+  left: 28rpx;
+  top: 4rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  padding: 0 10rpx;
+  border-radius: 15rpx;
+  background: #ff2d55;
   color: #fff;
-  font-size: 20rpx;
+  font-size: 18rpx;
   font-weight: 700;
+  box-shadow: 0 2rpx 8rpx rgba(255, 45, 85, 0.4);
 }
 
 .tabs-scroll {
@@ -296,12 +297,13 @@ export default {
 .tab {
   height: 96rpx;
   line-height: 96rpx;
-  margin: 0 24rpx;
+  margin: 0 22rpx;
   font-size: 38rpx;
   font-weight: 900;
-  color: #d1cbcc;
+  color: rgba(255, 255, 255, 0.5);
   position: relative;
   flex-shrink: 0;
+  transition: color 0.25s;
 }
 
 .tab.active {
@@ -311,28 +313,29 @@ export default {
 .tab.active::after {
   content: '';
   position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 8rpx;
+  left: 20%;
+  right: 20%;
+  bottom: 6rpx;
   height: 6rpx;
-  border-radius: 6rpx;
+  border-radius: 3rpx;
   background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(255, 255, 255, 0.3);
 }
 
 .search-icon {
   width: 56rpx;
   text-align: right;
-  font-size: 48rpx;
+  font-size: 46rpx;
   color: #fff;
 }
 
 /* 主内容 */
 .content {
-  padding-top: 34rpx;
+  padding-top: 28rpx;
   padding-bottom: 280rpx;
 }
 
-/* 横向卡片 */
+/* ===== 横向推荐卡片 ===== */
 .card-scroll {
   width: 100%;
   white-space: nowrap;
@@ -342,36 +345,30 @@ export default {
 
 .card-row {
   display: flex;
-  gap: 28rpx;
+  gap: 24rpx;
   width: max-content;
 }
 
 .top-card {
   width: 330rpx;
   height: 430rpx;
-  border-radius: 22rpx;
+  border-radius: 24rpx;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
   padding: 42rpx 28rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
 }
 
-.card-red {
-  background: linear-gradient(135deg, #8a102e, #d53266);
-}
+.top-card:active { transform: scale(0.96); }
 
-.card-purple {
-  background: linear-gradient(135deg, #251240, #814ac0);
-}
+.card-red    { background: linear-gradient(145deg, #c0392b 0%, #e74c3c 40%, #f39c6d 100%); }
+.card-purple { background: linear-gradient(145deg, #2c1050 0%, #6c30b0 40%, #9b6fd4 100%); }
+.card-green  { background: linear-gradient(145deg, #064847 0%, #0d8a7a 40%, #20c9b0 100%); }
+.card-pink   { background: linear-gradient(145deg, #c2185b 0%, #e91e63 40%, #f78da7 100%); }
 
-.card-green {
-  background: linear-gradient(135deg, #064847, #139184);
-}
-
-.card-pink {
-  background: linear-gradient(135deg, #b01b4b, #ff83b2);
-}
-
+/* 卡片装饰纹理 */
 .top-card::before,
 .playlist-cover::before,
 .song-cover::before {
@@ -379,14 +376,14 @@ export default {
   position: absolute;
   left: -20%;
   right: -20%;
-  top: 20%;
-  height: 4rpx;
-  background: rgba(255, 255, 255, 0.38);
+  top: 18%;
+  height: 3rpx;
+  background: rgba(255, 255, 255, 0.3);
   box-shadow:
-    0 54rpx 0 rgba(255, 255, 255, 0.28),
-    0 108rpx 0 rgba(255, 255, 255, 0.2),
-    0 162rpx 0 rgba(255, 255, 255, 0.28),
-    0 216rpx 0 rgba(255, 255, 255, 0.18);
+    0 52rpx 0 rgba(255, 255, 255, 0.22),
+    0 104rpx 0 rgba(255, 255, 255, 0.16),
+    0 156rpx 0 rgba(255, 255, 255, 0.22),
+    0 208rpx 0 rgba(255, 255, 255, 0.14);
   border-radius: 50%;
   transform: rotate(-2deg);
 }
@@ -396,42 +393,42 @@ export default {
 .song-cover::after {
   content: '';
   position: absolute;
-  width: 90rpx;
-  height: 90rpx;
-  right: 40rpx;
-  top: 36rpx;
+  width: 86rpx;
+  height: 86rpx;
+  right: 36rpx;
+  top: 32rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.2);
   box-shadow:
-    -160rpx 80rpx 0 rgba(255, 255, 255, 0.18),
-    -60rpx 190rpx 0 rgba(255, 255, 255, 0.12),
-    50rpx 250rpx 0 rgba(255, 255, 255, 0.12);
+    -150rpx 76rpx 0 rgba(255, 255, 255, 0.14),
+    -56rpx 182rpx 0 rgba(255, 255, 255, 0.1),
+    46rpx 242rpx 0 rgba(255, 255, 255, 0.1);
 }
 
 .card-disc {
   position: absolute;
-  width: 180rpx;
-  height: 180rpx;
+  width: 170rpx;
+  height: 170rpx;
   left: 50%;
   top: 50%;
-  margin-left: -90rpx;
-  margin-top: -90rpx;
+  margin-left: -85rpx;
+  margin-top: -85rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.22);
-  background: rgba(0, 0, 0, 0.16);
+  border: 3rpx solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.14);
 }
 
 .card-disc::after {
   content: '';
   position: absolute;
-  width: 74rpx;
-  height: 74rpx;
+  width: 66rpx;
+  height: 66rpx;
   left: 50%;
   top: 50%;
-  margin-left: -37rpx;
-  margin-top: -37rpx;
+  margin-left: -33rpx;
+  margin-top: -33rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.52);
 }
 
 .card-title {
@@ -440,6 +437,7 @@ export default {
   margin-top: 120rpx;
   font-size: 42rpx;
   font-weight: 900;
+  text-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.2);
 }
 
 .card-sub {
@@ -453,85 +451,83 @@ export default {
   white-space: nowrap;
 }
 
-/* 标题 */
+/* 标题行 */
 .section-title {
-  margin: 72rpx 46rpx 32rpx;
+  margin: 68rpx 46rpx 28rpx;
   font-size: 42rpx;
-  line-height: 56rpx;
   font-weight: 900;
   color: #fff;
+  letter-spacing: 1rpx;
 }
 
 .playlist-title {
-  margin-top: 60rpx;
+  margin-top: 56rpx;
 }
 
-/* 歌曲 */
+/* ===== 歌曲列表 ===== */
 .song-list {
-  padding: 0 46rpx;
+  padding: 0 42rpx;
 }
 
 .song-item {
   display: flex;
   align-items: center;
   min-height: 112rpx;
-  margin-bottom: 24rpx;
+  padding: 12rpx 4rpx;
+  border-radius: 14rpx;
+  margin-bottom: 8rpx;
+  transition: background 0.15s;
 }
+
+.song-item:active { background: rgba(255, 255, 255, 0.05); }
 
 .song-cover {
   width: 92rpx;
   height: 92rpx;
-  border-radius: 10rpx;
+  border-radius: 12rpx;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.3);
 }
 
-.song-black {
-  background: linear-gradient(135deg, #1f1f22, #5b5b61);
-}
-
-.song-red {
-  background: linear-gradient(135deg, #aa1436, #ff5b7d);
-}
-
-.song-blue {
-  background: linear-gradient(135deg, #0b4c82, #60b7f4);
-}
+.song-black { background: linear-gradient(135deg, #2c2c30, #5e5e66); }
+.song-red   { background: linear-gradient(135deg, #c0392b, #ff5b7d); }
+.song-blue  { background: linear-gradient(135deg, #1a5276, #5dade2); }
 
 .small-disc {
   position: absolute;
-  width: 52rpx;
-  height: 52rpx;
+  width: 48rpx;
+  height: 48rpx;
   border-radius: 50%;
-  border: 2rpx solid rgba(255, 255, 255, 0.28);
-  left: 20rpx;
-  top: 20rpx;
-  background: rgba(0, 0, 0, 0.2);
+  border: 2rpx solid rgba(255, 255, 255, 0.25);
+  left: 22rpx;
+  top: 22rpx;
+  background: rgba(0, 0, 0, 0.18);
 }
 
 .small-disc::after {
   content: '';
   position: absolute;
-  width: 20rpx;
-  height: 20rpx;
+  width: 18rpx;
+  height: 18rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.6);
   left: 50%;
   top: 50%;
-  margin-left: -10rpx;
-  margin-top: -10rpx;
+  margin-left: -9rpx;
+  margin-top: -9rpx;
 }
 
 .song-info {
   flex: 1;
-  margin-left: 26rpx;
+  margin-left: 24rpx;
   overflow: hidden;
 }
 
 .song-name {
-  font-size: 36rpx;
-  font-weight: 900;
+  font-size: 34rpx;
+  font-weight: 800;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
@@ -539,38 +535,42 @@ export default {
 }
 
 .song-desc {
-  margin-top: 8rpx;
+  margin-top: 6rpx;
   display: flex;
   align-items: center;
-  font-size: 28rpx;
+  font-size: 26rpx;
   overflow: hidden;
 }
 
 .song-tag {
   color: #ff2d55;
-  background: rgba(255, 45, 85, 0.16);
-  border-radius: 8rpx;
-  padding: 2rpx 8rpx;
-  margin-right: 12rpx;
+  background: rgba(255, 45, 85, 0.14);
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  margin-right: 10rpx;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 .singer {
-  color: #d6d0d1;
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .play-icon {
-  width: 78rpx;
+  width: 72rpx;
   flex-shrink: 0;
   text-align: right;
-  font-size: 54rpx;
-  color: #fff;
+  font-size: 48rpx;
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.15s;
 }
 
-/* 歌单 */
+.song-item:active .play-icon { transform: scale(0.88); }
+
+/* ===== 歌单卡片 ===== */
 .playlist-scroll {
   width: 100%;
   white-space: nowrap;
@@ -580,73 +580,67 @@ export default {
 
 .playlist-row {
   display: flex;
-  gap: 28rpx;
+  gap: 24rpx;
   width: max-content;
 }
 
 .playlist-card {
-  width: 320rpx;
+  width: 300rpx;
   flex-shrink: 0;
+  transition: transform 0.2s;
 }
+
+.playlist-card:active { transform: scale(0.96); }
 
 .playlist-cover {
-  width: 320rpx;
-  height: 320rpx;
-  border-radius: 18rpx;
+  width: 300rpx;
+  height: 300rpx;
+  border-radius: 20rpx;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.3);
 }
 
-.list-blue {
-  background: linear-gradient(135deg, #193758, #72b2e8);
-}
-
-.list-red {
-  background: linear-gradient(135deg, #741326, #e53d72);
-}
-
-.list-purple {
-  background: linear-gradient(135deg, #2a164e, #8a57cc);
-}
-
-.list-green {
-  background: linear-gradient(135deg, #064746, #19a593);
-}
+.list-blue   { background: linear-gradient(135deg, #1a3a5c, #5dade2); }
+.list-red    { background: linear-gradient(135deg, #8b1a3a, #e8436e); }
+.list-purple { background: linear-gradient(135deg, #2e1654, #9357d8); }
+.list-green  { background: linear-gradient(135deg, #0a4a48, #1db9a8); }
 
 .cover-disc {
   position: absolute;
-  width: 170rpx;
-  height: 170rpx;
+  width: 160rpx;
+  height: 160rpx;
   left: 50%;
   top: 50%;
-  margin-left: -85rpx;
-  margin-top: -85rpx;
+  margin-left: -80rpx;
+  margin-top: -80rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.22);
-  background: rgba(0, 0, 0, 0.16);
+  border: 3rpx solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.14);
 }
 
 .cover-disc::after {
   content: '';
   position: absolute;
-  width: 62rpx;
-  height: 62rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
   left: 50%;
   top: 50%;
-  margin-left: -31rpx;
-  margin-top: -31rpx;
-  background: rgba(255, 255, 255, 0.62);
+  margin-left: -28rpx;
+  margin-top: -28rpx;
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .playlist-name {
-  margin-top: 16rpx;
+  margin-top: 14rpx;
   font-size: 26rpx;
   color: #fff;
   white-space: nowrap;
+  font-weight: 600;
 }
 
 .bottom-space {
-  height: 300rpx;
+  height: 280rpx;
 }
 </style>

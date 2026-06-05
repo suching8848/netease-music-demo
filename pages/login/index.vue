@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view class="status-bar"></view>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
     <view class="top">
       <view class="back" @tap="goBack">‹</view>
@@ -70,11 +70,15 @@ import { STUDENT, LOGIN_KEY } from '../../common/data.js'
 export default {
   data() {
     return {
+      statusBarHeight: 44,
       studentId: '',
       studentName: '',
       password: '',
       agree: false
     }
+  },
+  created() {
+    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
   },
   methods: {
     goBack() {
@@ -124,7 +128,7 @@ export default {
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #665D5F;
+  background: linear-gradient(180deg, #5a5053 0%, #665D5F 40%, #4a4245 100%);
   padding: 0 40rpx;
 }
 .top {
@@ -234,9 +238,10 @@ export default {
   height: 88rpx;
   line-height: 88rpx;
   border-radius: 46rpx;
-  background: #ff1935;
+  background: linear-gradient(135deg, #ff2d55, #ff6b81);
   color: #fff;
   font-size: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 45, 85, 0.35);
   font-weight: 900;
   text-align: center;
 }

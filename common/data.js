@@ -121,25 +121,25 @@ export const profile = {
 
 export const myPlaylists = [
   {
-    id: 1,
+    id: 5,
     image: '/static/images/pl1.jpg',
     title: '我喜欢的音乐',
     desc: '11646首 · 3669次播放'
   },
   {
-    id: 2,
+    id: 6,
     image: '/static/images/pl2.jpg',
     title: '今日私人雷达',
     desc: '歌单 · 35首 · 云音乐私人推荐'
   },
   {
-    id: 3,
+    id: 7,
     image: '/static/images/pl3.jpg',
     title: '学习时听的歌',
     desc: '歌单 · 295首 · 音乐用户'
   },
   {
-    id: 4,
+    id: 8,
     image: '/static/images/pl4.jpg',
     title: '深夜循环歌单',
     desc: '歌单 · 82首 · 最近常听'
@@ -151,3 +151,124 @@ export const playerInfo = {
   song: '游戏《Orzmic》第九章魔王曲',
   singer: 'CS4W'
 }
+
+// ============================================================
+// 全屏播放器 & 歌单详情 扩展数据
+// ============================================================
+
+// 曲库 — 所有可播放的歌曲
+export const allSongs = [
+  { id: 1, name: '声', singer: 'Feryquitous', album: 'Diverse System', duration: '04:32', cover: '/static/images/song1.jpg' },
+  { id: 2, name: 'SYSTEM ERROR', singer: 'Laur', album: 'Last Dance', duration: '03:15', cover: '/static/images/song2.jpg' },
+  { id: 3, name: 'MEGATON BLAST', singer: 'BlackY / Yooh', album: 'HARDCORE SYNDROME', duration: '02:48', cover: '/static/images/song3.jpg' },
+  { id: 4, name: '心做し (Live)', singer: 'majiko', album: '寂寞的人最虚伪', duration: '05:21', cover: '/static/images/discover1.jpg' },
+  { id: 5, name: 'Mouth Go La', singer: 'Snail\'s House', album: 'Pixel Galaxy', duration: '03:44', cover: '/static/images/discover3.jpg' },
+  { id: 6, name: 'ピースサイン', singer: '米津玄師', album: 'BOOTLEG', duration: '03:57', cover: '/static/images/note1.jpg' },
+  { id: 7, name: '夜に駆ける', singer: 'YOASOBI', album: 'THE BOOK', duration: '04:18', cover: '/static/images/note3.jpg' },
+  { id: 8, name: 'Lemon', singer: '米津玄師', album: 'STRAY SHEEP', duration: '04:16', cover: '/static/images/note5.jpg' },
+  { id: 9, name: '打上花火', singer: 'DAOKO × 米津玄師', album: 'THANK YOU BLUE', duration: '04:49', cover: '/static/images/cover1.jpg' },
+  { id: 10, name: '炎', singer: 'LiSA', album: 'LEO-NiNE', duration: '04:34', cover: '/static/images/cover2.jpg' }
+]
+
+// 歌单详情 — 每个歌单包含的歌曲 ID 和描述
+export const playlistDetailMap = {
+  1: {
+    id: 1,
+    title: '粉色电波',
+    image: '/static/images/pl1.jpg',
+    desc: '电子音乐与流行旋律的完美融合，粉色的声波穿透耳膜',
+    playCount: '286万',
+    songIds: [1, 2, 3, 5, 7]
+  },
+  2: {
+    id: 2,
+    title: '雨天漫画',
+    image: '/static/images/pl2.jpg',
+    desc: '窗外的雨声和耳机里的旋律，是最搭的漫画背景音乐',
+    playCount: '154万',
+    songIds: [4, 6, 8, 9, 1]
+  },
+  3: {
+    id: 3,
+    title: '赛博节奏',
+    image: '/static/images/pl3.jpg',
+    desc: '高速电子节拍 × 赛博朋克美学，未来感十足',
+    playCount: '421万',
+    songIds: [2, 3, 5, 7, 10]
+  },
+  4: {
+    id: 4,
+    title: '深夜治愈',
+    image: '/static/images/pl4.jpg',
+    desc: '温柔的人声和轻缓的旋律，陪你度过每一个深夜',
+    playCount: '198万',
+    songIds: [6, 8, 9, 4, 1]
+  },
+  // 「我的」页面 4 个歌单 (ID 5-8)
+  5: {
+    id: 5,
+    title: '我喜欢的音乐',
+    image: '/static/images/pl1.jpg',
+    desc: '11646首 · 3669次播放',
+    playCount: '3669次',
+    songIds: [1, 6, 7, 8, 9, 2, 3, 10]
+  },
+  6: {
+    id: 6,
+    title: '今日私人雷达',
+    image: '/static/images/pl2.jpg',
+    desc: '歌单 · 35首 · 云音乐私人推荐',
+    playCount: '35首',
+    songIds: [5, 3, 7, 1, 4, 6]
+  },
+  7: {
+    id: 7,
+    title: '学习时听的歌',
+    image: '/static/images/pl3.jpg',
+    desc: '歌单 · 295首 · 音乐用户',
+    playCount: '295首',
+    songIds: [10, 8, 6, 9, 4]
+  },
+  8: {
+    id: 8,
+    title: '深夜循环歌单',
+    image: '/static/images/pl4.jpg',
+    desc: '歌单 · 82首 · 最近常听',
+    playCount: '82首',
+    songIds: [8, 6, 9, 1, 7, 2]
+  }
+}
+
+// 模拟歌词 — 用于全屏播放器
+export const mockLyrics = [
+  { time: 0, text: '♬ 纯音乐，请您欣赏 ♬' },
+  { time: 5, text: '夜の街を駆け抜けて' },
+  { time: 10, text: 'ネオンの海を泳いで' },
+  { time: 15, text: '君のいないこの世界は' },
+  { time: 20, text: 'まるで色のない絵画のよう' },
+  { time: 25, text: '♬' },
+  { time: 30, text: 'それでも朝は来るから' },
+  { time: 35, text: '新しいページをめくろう' },
+  { time: 40, text: '昨日までの涙は' },
+  { time: 45, text: '明日への道しるべ' },
+  { time: 50, text: '♬' },
+  { time: 55, text: '耳を澄ませば聴こえる' },
+  { time: 60, text: '遠くの街のざわめきが' },
+  { time: 65, text: '誰もが誰かを想いながら' },
+  { time: 70, text: '今日を生きているんだ' },
+  { time: 75, text: '♬ 間奏 ♬' },
+  { time: 105, text: 'さあ手を伸ばして' },
+  { time: 110, text: '光の方へ歩き出そう' },
+  { time: 115, text: '君がくれた勇気を胸に' },
+  { time: 120, text: '新しい歌を歌おう' },
+  { time: 125, text: '♬' }
+]
+
+// 消息中心 mock 数据
+export const mockMessages = [
+  { id: 1, title: '系统通知', text: '您的歌单「深夜循环歌单」被推荐到首页', time: '10分钟前', read: false, icon: '🔔', iconClass: 'system' },
+  { id: 2, title: '歌单更新', text: '「今日私人雷达」已更新，快来听听新歌', time: '2小时前', read: false, icon: '📋', iconClass: 'playlist' },
+  { id: 3, title: '版本更新', text: '云音乐复刻 v1.1.0 已发布，新增全屏播放器', time: '昨天', read: false, icon: '🆕', iconClass: 'update' },
+  { id: 4, title: '活动提醒', text: '周年庆活动进行中，免费天数已发放到您的账户', time: '2天前', read: true, icon: '🎁', iconClass: 'activity' },
+  { id: 5, title: '音乐周报', text: '本周您一共听了 127 首歌，总时长 8.4 小时', time: '3天前', read: true, icon: '📊', iconClass: 'notice' }
+]

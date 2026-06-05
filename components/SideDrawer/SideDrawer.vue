@@ -445,12 +445,12 @@ export default {
   left: 0;
   width: 80vw; /* drawerWidth: 80vw */
   height: 100vh;
-  background: #5c5c5c;
+  background: linear-gradient(180deg, #50484a 0%, #5c5456 20%, #4a4345 100%);
   display: flex;
   flex-direction: column;
   transform: translateX(-100%);
-  transition: transform 280ms ease;
-  box-shadow: 8rpx 0 40rpx rgba(0, 0, 0, 0.25);
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 12rpx 0 48rpx rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
 
@@ -769,9 +769,10 @@ export default {
 /* ---- C. 主菜单卡片 ---- */
 .menu-card {
   margin: 24rpx 36rpx 0 36rpx;
-  border-radius: 12rpx;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14rpx;
+  background: rgba(255, 255, 255, 0.07);
   overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
 }
 
 .menu-item {
@@ -780,10 +781,11 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 0 28rpx;
+  transition: background 0.12s;
 }
 
 .menu-item:active {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .menu-left {

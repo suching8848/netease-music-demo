@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view class="status-bar"></view>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
     <view class="note-top">
       <view class="menu" @tap="openDrawer">☰</view>
@@ -66,48 +66,27 @@
 import { noteList } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
-import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
+import drawerMixin from '../../common/drawerMixin.js'
 
 export default {
+  mixins: [drawerMixin],
   components: {
     MiniPlayer,
-    BottomTab,
-    SideDrawer
+    BottomTab
   },
   data() {
     return {
-      showDrawer: false,
+      statusBarHeight: 44,
       leftList: [],
       rightList: []
     }
   },
+  created() {
+    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+  },
   onLoad() {
     this.leftList = noteList.filter((item, index) => index % 2 === 0)
     this.rightList = noteList.filter((item, index) => index % 2 !== 0)
-  },
-  onHide() {
-    this.showDrawer = false
-  },
-  methods: {
-    openDrawer() {
-      this.showDrawer = true
-    },
-    onUserClick() {
-      this.showDrawer = false
-      uni.reLaunch({ url: '/pages/mine/index' })
-    },
-    onDrawerItemClick(item) {
-      console.log('抽屉菜单点击:', item.key, item.title)
-      this.showDrawer = false
-    },
-    onSettingClick() {
-      console.log('设置点击')
-      this.showDrawer = false
-    },
-    onMoreClick() {
-      console.log('更多点击')
-      this.showDrawer = false
-    }
   }
 }
 </script>
@@ -115,7 +94,7 @@ export default {
 <style scoped>
 .page {
   height: 100vh;
-  background: #665D5F;
+  background: linear-gradient(180deg, #5a5053 0%, #665D5F 30%, #4a4245 100%);
   overflow: hidden;
 }
 .note-top {
@@ -123,13 +102,18 @@ export default {
   display: flex;
   align-items: center;
   padding: 0 24rpx;
-  border-bottom: 1rpx solid rgba(255,255,255,.08);
+  background: rgba(102, 93, 95, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(255,255,255,.06);
 }
 .menu {
   width: 112rpx;
   color: #fff;
-  font-size: 52rpx;
+  font-size: 48rpx;
+  transition: transform 0.15s;
 }
+.menu:active { transform: scale(0.88); }
 .tabs {
   flex: 1;
   display: flex;
@@ -201,32 +185,35 @@ export default {
   min-width: 0;
 }
 .note-card {
-  background: #6D6466;
-  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12rpx;
   overflow: hidden;
   margin-bottom: 14rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s;
 }
+.note-card:active { transform: scale(0.97); }
 .note-img {
   width: 100%;
   background: #554d4f;
   display: block;
 }
 .note-body {
-  padding: 22rpx 24rpx 20rpx;
+  padding: 20rpx 22rpx 18rpx;
 }
 .note-title {
   color: #fff;
-  font-size: 30rpx;
-  font-weight: 900;
-  line-height: 42rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 40rpx;
 }
 .note-foot {
-  margin-top: 18rpx;
+  margin-top: 16rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: rgba(255,255,255,.62);
-  font-size: 25rpx;
+  color: rgba(255,255,255,.55);
+  font-size: 24rpx;
 }
 .user {
   max-width: 190rpx;
@@ -249,6 +236,6 @@ export default {
   font-size: 26rpx;
 }
 .bottom-safe {
-  height: 260rpx;
+  height: 280rpx;
 }
 </style>

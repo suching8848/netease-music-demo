@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view class="status-bar"></view>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
     <view class="top-bar">
       <text class="icon left" @tap="openDrawer">☰</text>
@@ -72,7 +72,7 @@
           <button class="login-btn" @tap="goLogin">去登录</button>
         </view>
 
-        <view class="playlist-item" v-for="item in playlists" :key="item.id">
+        <view class="playlist-item" v-for="item in playlists" :key="item.id" @tap="goPlaylist(item.id)">
           <image class="playlist-img" :src="item.image" mode="aspectFill"></image>
           <view class="playlist-info">
             <view class="playlist-name">{{ item.title }}</view>
@@ -104,48 +104,35 @@
 import { profile, myPlaylists, LOGIN_KEY } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
-import SideDrawer from '../../components/SideDrawer/SideDrawer.vue'
+import drawerMixin from '../../common/drawerMixin.js'
 
 export default {
+  mixins: [drawerMixin],
   components: {
     MiniPlayer,
-    BottomTab,
-    SideDrawer
+    BottomTab
   },
   data() {
     return {
+      statusBarHeight: 44,
       profile,
       playlists: myPlaylists,
-      loginUser: null,
-      showDrawer: false
+      loginUser: null
     }
+  },
+  created() {
+    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
   },
   onShow() {
     this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
-  onHide() {
-    // 页面离开时关闭抽屉，避免残留
-    this.showDrawer = false
-  },
   methods: {
-    openDrawer() {
-      this.showDrawer = true
-    },
+    // 已在「我的」页，点用户区直接关闭抽屉即可
     onUserClick() {
-      // 已在「我的」页面，关闭抽屉即可（本页已有登入/登出功能）
       this.showDrawer = false
     },
-    onDrawerItemClick(item) {
-      console.log('抽屉菜单点击:', item.key, item.title)
-      this.showDrawer = false
-    },
-    onSettingClick() {
-      console.log('设置点击')
-      this.showDrawer = false
-    },
-    onMoreClick() {
-      console.log('更多点击')
-      this.showDrawer = false
+    goPlaylist(playlistId) {
+      uni.navigateTo({ url: '/pages/playlist/index?playlistId=' + playlistId })
     },
     goLogin() {
       uni.navigateTo({ url: '/pages/login/index' })
@@ -170,7 +157,7 @@ export default {
 <style scoped>
 .page {
   height: 100vh;
-  background: #665D5F;
+  background: linear-gradient(180deg, #5a5053 0%, #665D5F 30%, #4a4245 100%);
   overflow: hidden;
 }
 .top-bar {
@@ -179,12 +166,17 @@ export default {
   display: flex;
   align-items: center;
   color: #fff;
+  background: rgba(102, 93, 95, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 .icon {
   color: #fff;
-  font-size: 48rpx;
+  font-size: 44rpx;
   line-height: 1;
+  transition: transform 0.15s;
 }
+.icon:active { transform: scale(0.85); }
 .left {
   width: 120rpx;
 }
@@ -215,7 +207,8 @@ export default {
   height: 198rpx;
   border-radius: 50%;
   background: #554d4f;
-  box-shadow: 0 12rpx 28rpx rgba(0,0,0,.12);
+  box-shadow: 0 12rpx 36rpx rgba(0, 0, 0, 0.3);
+  border: 4rpx solid rgba(255, 255, 255, 0.08);
 }
 .name-line {
   margin-top: 34rpx;
@@ -433,6 +426,6 @@ export default {
   font-size: 26rpx;
 }
 .bottom-safe {
-  height: 260rpx;
+  height: 280rpx;
 }
 </style>
