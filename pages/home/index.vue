@@ -1,11 +1,12 @@
 <template>
   <view class="page-root">
     <view class="page">
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-    <!-- 顶部导航 -->
-    <view class="top-nav">
+    <!-- 固定顶部区域：状态栏 + 导航栏 -->
+    <view class="header-fixed" :style="{ paddingTop: statusBarHeight + 'px' }">
+      <view class="top-nav">
       <view class="left-menu" @tap.stop="openDrawer">
         <text class="menu-icon">☰</text>
+        <view class="menu-badge">99+</view>
       </view>
 
       <scroll-view scroll-x class="tabs-scroll" :show-scrollbar="false">
@@ -24,9 +25,18 @@
 
       <view class="search-icon" @tap="goSearch">⌕</view>
     </view>
+    </view><!-- .header-fixed -->
 
     <!-- 首页内容 -->
     <view class="content">
+      <!-- 固定头部的占位，防止内容被遮挡 -->
+      <view :style="{ height: headerSpacerH + 'px' }"></view>
+
+      <!-- 播客频道：显示播客主界面 -->
+      <podcast-home-page v-if="isPodcastTab" />
+
+      <!-- 其他频道：原有首页内容 -->
+      <template v-else>
       <!-- 顶部横向卡片 -->
       <scroll-view
         scroll-x
@@ -100,6 +110,7 @@
       </scroll-view>
 
       <view class="bottom-space"></view>
+      </template>
     </view>
 
     <!-- 底部播放器 -->
@@ -117,7 +128,8 @@
         <view class="drawer-user-info" @tap="handleDrawerUserClick">
           <image class="drawer-avatar" src="/static/avatar.png" mode="aspectFill" />
           <view class="drawer-user-name-row">
-            <text class="drawer-user-name">su_ching蘇清</text>
+            <text v-if="!loginUser" class="drawer-user-name" style="color:rgba(255,255,255,0.45)">未登录</text>
+            <text v-else class="drawer-user-name">{{ loginUser.name }}</text>
             <text class="drawer-user-arrow">›</text>
           </view>
         </view>
@@ -180,21 +192,25 @@
 <script>
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
-import { allSongs, currentPlaySong } from '../../common/data.js'
+import PodcastHomePage from '../../components/PodcastHomePage.vue'
+import { allSongs, currentPlaySong, LOGIN_KEY } from '../../common/data.js'
 import drawerMixin from '../../common/drawerMixin.js'
 
 export default {
   mixins: [drawerMixin],
   components: {
     MiniPlayer,
-    BottomTab
+    BottomTab,
+    PodcastHomePage
   },
   data() {
     return {
       statusBarHeight: 44,
+      headerSpacerH: 140,
       showDrawer: false,
-      currentTab: 1,
-      tabs: ['心动', '推荐', '音乐', '会员大促', '播客'],
+      loginUser: null,
+      currentTab: 0,
+      tabs: ['推荐', '音乐', '播客', '听书'],
       topCards: [
         {
           id: 1,
@@ -268,8 +284,19 @@ export default {
       ]
     }
   },
+  computed: {
+    isPodcastTab() {
+      return this.tabs[this.currentTab] === '播客'
+    }
+  },
   created() {
-    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+    const info = uni.getSystemInfoSync()
+    this.statusBarHeight = info.statusBarHeight || 44
+    const topBarPx = 96 * (info.screenWidth / 750)
+    this.headerSpacerH = this.statusBarHeight + topBarPx
+  },
+  onShow() {
+    this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
   methods: {
     /** 播放指定歌曲 → 全屏播放器 */
@@ -305,18 +332,22 @@ export default {
   overflow-x: hidden;
 }
 
-/* 顶部导航 — 毛玻璃效果 */
+/* 固定头部 — 状态栏背景 + 导航栏，始终在屏幕顶部 */
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(102, 93, 95, 0.75);
+}
+
+/* 顶部导航 */
 .top-nav {
   height: 96rpx;
   padding: 0 28rpx;
   display: flex;
   align-items: center;
-  background: rgba(102, 93, 95, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  position: sticky;
-  top: 0;
-  z-index: 30;
   border-bottom: 1rpx solid rgba(255, 255, 255, 0.06);
 }
 
@@ -345,6 +376,23 @@ export default {
 }
 
 .menu-icon:active { transform: scale(0.88); }
+
+.menu-badge {
+  position: absolute;
+  top: 6rpx;
+  right: -4rpx;
+  min-width: 38rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  padding: 0 8rpx;
+  border-radius: 15rpx;
+  background: #ff2d55;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
+}
 
 .badge {
   position: absolute;

@@ -108,7 +108,7 @@ export default {
         this.studentName !== STUDENT.name ||
         this.password !== STUDENT.password
       ) {
-        uni.showToast({ title: '学号、姓名或密码错误', icon: 'none' })
+        uni.showToast({ title: '账号未注册（功能未开发）', icon: 'none' })
         return
       }
 

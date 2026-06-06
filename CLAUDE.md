@@ -23,7 +23,7 @@ There are no tests, no linters, and no build scripts.
 - **Styling**: Scoped CSS with `rpx` units (uni-app's responsive pixel unit, 750rpx = screen width)
 - **State**: Component-local `data()` + `uni.setStorageSync`/`uni.getStorageSync` for login persistence. No Vuex or Pinia.
 - **Routing**: File-based routing declared in `pages.json`. Navigation via `uni.navigateTo`, `uni.reLaunch`, `uni.navigateBack`. No Vue Router.
-- **Build output**: `unpackage/` — HBuilderX generated build artifacts (gitignored). Never edit these files directly.
+- **Build output**: `unpackage/` — HBuilderX generated build artifacts (gitignored). Also gitignored: `.hbuilderx/` (IDE state), `.DS_Store`, `Thumbs.db`, `*.swp`, `*.swo`. Never edit these files directly.
 
 ## Architecture
 
@@ -45,8 +45,11 @@ Secondary pages (pushed via navigateTo):
   ├── pages/settings/index.vue  设置 / Settings
   └── pages/messages/index.vue  消息中心 / Messages
 
-Demo page:
-  └── pages/index/index.vue     演示 / SideDrawer demo (uses SideDrawer.vue component)
+Demo page (development-only, no tab bar entry):
+  └── pages/index/index.vue     演示 / SideDrawer component showcase
+       The ONLY page that uses <side-drawer> as a component (via v-model).
+       Includes an interaction logger that timestamps drawer open/close/item-click events.
+       Proves the component works on H5 despite failing on App platform.
 ```
 
 **Navigation hierarchy**: The four primary pages are tab-bar pages that switch via `uni.reLaunch`. Secondary pages are pushed onto the navigation stack via `uni.navigateTo` and popped via `uni.navigateBack`.
@@ -124,7 +127,7 @@ Central mock data file exporting all constants used across pages. Key exports:
 |--------|---------|
 | `STUDENT` | Default test account (id, name, password) |
 | `LOGIN_KEY` | Storage key for login session (`'musicFinalLoginUser'`) |
-| `theme` | Color palette (bg, panel, text, subText, red) |
+| `theme` | Color palette (bg, panel, panelDark, text, subText, red). Note: `panelDark` is defined but unused across all Vue files; no page actually imports `theme` — colors are hardcoded inline. |
 | `homeTabs`, `homeCards`, `recommendSongs`, `recommendPlaylists` | Home page content |
 | `discoverIcons`, `quickDiscover`, `browseAll` | Search/discover page content |
 | `noteList` | Note cards with varying heights (`h` field) for waterfall layout |
@@ -221,4 +224,4 @@ CSS `@keyframes animation` on a `v-if`-mounted element may not trigger on App pl
 
 ## Static assets
 
-`static/images/` contains 25 placeholder JPEG/PNG images (covers, songs, playlists, notes, avatar). To customize visuals, replace these files keeping the same filenames — no code changes needed.
+`static/images/` contains 27 placeholder images (26 JPG covers/notes + 1 PNG avatar). To customize visuals, replace these files keeping the same filenames — no code changes needed.

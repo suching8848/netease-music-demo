@@ -1,10 +1,12 @@
 <template>
   <view class="page-root">
-    <view class="page" :style="{ '--status-bar-height': statusBarPx }">
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-
+    <!-- 统一顶栏：fixed，在 .page 外部 -->
+    <view class="header-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
     <view class="note-top">
-      <view class="menu" @tap="openDrawer">☰</view>
+      <view class="menu" @tap="openDrawer">
+        <text>☰</text>
+        <view class="menu-badge">99+</view>
+      </view>
 
       <view class="tabs">
         <view
@@ -24,8 +26,11 @@
         <text class="plus" @tap="createNote">＋</text>
       </view>
     </view>
+    </view><!-- .header-bar -->
 
+    <view class="page" :style="{ '--status-bar-height': statusBarPx }">
     <scroll-view scroll-y class="content" :show-scrollbar="false">
+      <view :style="{ height: headerSpacerH + 'px' }"></view>
       <view class="waterfall">
         <view class="col">
           <view class="note-card" v-for="item in leftList" :key="item.id">
@@ -60,7 +65,7 @@
     <view class="feedback" @tap="showFeedback">✎ 意见反馈</view>
     <mini-player></mini-player>
     <bottom-tab active="note"></bottom-tab>
-  </view>
+  </view><!-- .page -->
 
   <view v-if="showDrawer" class="drawer-root">
     <view class="drawer-mask" :style="{ opacity: drawerActive ? 1 : 0 }" @tap.stop="handleDrawerMaskTap"></view>
@@ -68,7 +73,7 @@
       <view class="drawer-top">
         <view class="drawer-user-info" @tap="handleDrawerUserClick">
           <image class="drawer-avatar" src="/static/avatar.png" mode="aspectFill" />
-          <view class="drawer-user-name-row"><text class="drawer-user-name">su_ching蘇清</text><text class="drawer-user-arrow">›</text></view>
+          <view class="drawer-user-name-row"><text v-if="!loginUser" class="drawer-user-name" style="color:rgba(255,255,255,0.45)">未登录</text><text v-else class="drawer-user-name">{{ loginUser.name }}</text><text class="drawer-user-arrow">›</text></view>
         </view>
       </view>
       <scroll-view class="drawer-scroll" scroll-y :show-scrollbar="false" enhanced>
@@ -111,7 +116,7 @@
 </template>
 
 <script>
-import { noteList } from '../../common/data.js'
+import { noteList, LOGIN_KEY } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
 import drawerMixin from '../../common/drawerMixin.js'
@@ -126,19 +131,27 @@ export default {
     return {
       statusBarHeight: 44,
       statusBarPx: '44px',
+      headerSpacerH: 140,
       showDrawer: false,
+      loginUser: null,
       activeTab: 'recommend',
       leftList: [],
       rightList: []
     }
   },
   created() {
-    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+    const info = uni.getSystemInfoSync()
+    this.statusBarHeight = info.statusBarHeight || 44
     this.statusBarPx = this.statusBarHeight + 'px'
+    const topBarPx = 96 * (info.screenWidth / 750)
+    this.headerSpacerH = this.statusBarHeight + topBarPx
   },
   onLoad() {
     this.leftList = noteList.filter((item, index) => index % 2 === 0)
     this.rightList = noteList.filter((item, index) => index % 2 !== 0)
+  },
+  onShow() {
+    this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
   methods: {
     goSearch() {
@@ -172,15 +185,22 @@ export default {
   height: 100vh;
   overflow: hidden;
 }
+/* 统一顶栏 */
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(102, 93, 95, 0.75);
+  border-bottom: 1rpx solid rgba(255,255,255,.06);
+}
+
 .note-top {
   height: 96rpx;
   display: flex;
   align-items: center;
   padding: 0 24rpx;
-  background: rgba(102, 93, 95, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1rpx solid rgba(255,255,255,.06);
 }
 .menu {
   width: 88rpx;
@@ -193,9 +213,28 @@ export default {
   font-size: 48rpx;
   z-index: 999;
   flex-shrink: 0;
+  position: relative;
   transition: transform 0.15s;
 }
 .menu:active { transform: scale(0.88); }
+
+.menu-badge {
+  position: absolute;
+  top: 6rpx;
+  right: -4rpx;
+  min-width: 38rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  padding: 0 8rpx;
+  border-radius: 15rpx;
+  background: #ff2d55;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
+}
+
 .tabs {
   flex: 1;
   display: flex;
@@ -255,7 +294,7 @@ export default {
   text-align: center;
 }
 .content {
-  height: calc(100vh - var(--status-bar-height) - 96rpx);
+  height: 100vh;
 }
 .waterfall {
   display: flex;

@@ -1,12 +1,11 @@
 <template>
   <view class="page-root">
-    <view class="page" :style="{ '--status-bar-height': statusBarPx }">
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-
-    <!-- 搜索栏 — 点击切换输入模式 -->
+    <!-- 统一顶栏：fixed，在 .page 外部 -->
+    <view class="header-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
     <view class="search-top">
       <view class="left-menu" @tap.stop="openDrawer">
         <text class="menu-icon">☰</text>
+        <view class="menu-badge">99+</view>
       </view>
 
       <!-- 搜索框 — 点击任意位置激活 -->
@@ -32,9 +31,12 @@
       <view class="mic" v-if="!searching">◉</view>
       <view class="cancel-btn" v-else @tap="cancelSearch">取消</view>
     </view>
+    </view><!-- .header-bar -->
 
+    <view class="page" :style="{ '--status-bar-height': statusBarPx }">
     <!-- 搜索结果 -->
     <scroll-view v-if="searching" scroll-y class="content" :show-scrollbar="false">
+      <view :style="{ height: headerSpacerH + 'px' }"></view>
       <view class="result-count" v-if="searchQuery">
         找到 {{ searchResults.length }} 首歌曲
       </view>
@@ -60,6 +62,7 @@
 
     <!-- 正常内容（非搜索状态） -->
     <scroll-view v-else scroll-y class="content" :show-scrollbar="false">
+      <view :style="{ height: headerSpacerH + 'px' }"></view>
       <view class="icon-row">
         <view class="icon-item" v-for="item in icons" :key="item.id" @tap="onDiscoverTap(item)">
           <view class="round-icon">{{ item.icon }}</view>
@@ -108,7 +111,7 @@
 
     <mini-player></mini-player>
     <bottom-tab active="search"></bottom-tab>
-  </view>
+  </view><!-- .page -->
 
   <view v-if="showDrawer" class="drawer-root">
     <view class="drawer-mask" :style="{ opacity: drawerActive ? 1 : 0 }" @tap.stop="handleDrawerMaskTap"></view>
@@ -116,7 +119,7 @@
       <view class="drawer-top">
         <view class="drawer-user-info" @tap="handleDrawerUserClick">
           <image class="drawer-avatar" src="/static/avatar.png" mode="aspectFill" />
-          <view class="drawer-user-name-row"><text class="drawer-user-name">su_ching蘇清</text><text class="drawer-user-arrow">›</text></view>
+          <view class="drawer-user-name-row"><text v-if="!loginUser" class="drawer-user-name" style="color:rgba(255,255,255,0.45)">未登录</text><text v-else class="drawer-user-name">{{ loginUser.name }}</text><text class="drawer-user-arrow">›</text></view>
         </view>
       </view>
       <scroll-view class="drawer-scroll" scroll-y :show-scrollbar="false" enhanced>
@@ -159,7 +162,7 @@
 </template>
 
 <script>
-import { discoverIcons, quickDiscover, browseAll, allSongs, currentPlaySong } from '../../common/data.js'
+import { discoverIcons, quickDiscover, browseAll, allSongs, currentPlaySong, LOGIN_KEY } from '../../common/data.js'
 import MiniPlayer from '../../components/mini-player.vue'
 import BottomTab from '../../components/bottom-tab.vue'
 import drawerMixin from '../../common/drawerMixin.js'
@@ -174,7 +177,9 @@ export default {
     return {
       statusBarHeight: 44,
       statusBarPx: '44px',
+      headerSpacerH: 140,
       showDrawer: false,
+      loginUser: null,
       icons: discoverIcons,
       quickList: quickDiscover,
       browseList: browseAll,
@@ -185,8 +190,14 @@ export default {
     }
   },
   created() {
-    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 44
+    const info = uni.getSystemInfoSync()
+    this.statusBarHeight = info.statusBarHeight || 44
     this.statusBarPx = this.statusBarHeight + 'px'
+    const topBarPx = 96 * (info.screenWidth / 750)
+    this.headerSpacerH = this.statusBarHeight + topBarPx
+  },
+  onShow() {
+    this.loginUser = uni.getStorageSync(LOGIN_KEY) || null
   },
   methods: {
     /* ====== 搜索逻辑 ====== */
@@ -259,6 +270,16 @@ export default {
   overflow: hidden;
 }
 
+/* 统一顶栏 */
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(102, 93, 95, 0.75);
+}
+
 /* 搜索栏 */
 .search-top {
   height: 96rpx;
@@ -291,6 +312,23 @@ export default {
 }
 
 .menu-icon:active { transform: scale(0.88); }
+
+.menu-badge {
+  position: absolute;
+  top: 6rpx;
+  right: -4rpx;
+  min-width: 38rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  padding: 0 8rpx;
+  border-radius: 15rpx;
+  background: #ff2d55;
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
+}
 
 .badge {
   position: absolute;
@@ -441,7 +479,7 @@ export default {
 .empty-text { color: rgba(255,255,255,0.35); font-size: 28rpx; }
 
 /* ====== 原有发现内容 ====== */
-.content { height: calc(100vh - var(--status-bar-height) - 96rpx); }
+.content { height: 100vh; }
 
 .icon-row {
   height: 180rpx;
