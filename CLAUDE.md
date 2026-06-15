@@ -22,7 +22,7 @@ There are no tests, no linters, and no build scripts.
 - **Language**: JavaScript (no TypeScript)
 - **Styling**: Scoped CSS with `rpx` units (uni-app's responsive pixel unit, 750rpx = screen width)
 - **State**: Component-local `data()` + `uni.setStorageSync`/`uni.getStorageSync` for login persistence. No Vuex or Pinia.
-- **Routing**: File-based routing declared in `pages.json`. Navigation via `uni.navigateTo`, `uni.reLaunch`, `uni.navigateBack`. No Vue Router.
+- **Routing**: File-based routing declared in `pages.json`. Navigation via `uni.navigateTo`, `uni.reLaunch`, `uni.navigateBack`. No Vue Router. Note: the tab bar is NOT a `pages.json` tabBar — it's the custom `bottom-tab.vue` component that calls `uni.reLaunch` on tap.
 - **Build output**: `unpackage/` — HBuilderX generated build artifacts (gitignored). Also gitignored: `.hbuilderx/` (IDE state), `.DS_Store`, `Thumbs.db`, `*.swp`, `*.swo`. Never edit these files directly.
 
 ## Architecture
@@ -58,6 +58,10 @@ Demo page (development-only, no tab bar entry):
 - `bottom-tab.vue` — reusable bottom tab bar (accepts `active` prop: `"home"` | `"search"` | `"note"` | `"mine"`). Navigates via `uni.reLaunch`. Used by all four main pages.
 - `mini-player.vue` — fixed bottom mini player with spinning record animation. Used by all pages except login. Displays song info from `playerInfo` in `data.js`, initialized at mount and updated reactively via the `uni.$on('playSong')` event bus. Clicking it navigates to the full-screen player page. Emits `playingChange` events so other components can react to play/pause state.
 - `SideDrawer/SideDrawer.vue` — left-side slide-out drawer **component** (used only by the demo page `pages/index/index.vue`). On the App platform, this component does NOT work reliably due to uni-app's sub-component rendering isolation (see known issues below).
+- `PodcastHomePage.vue` — composite component that assembles the podcast tab UI (quick actions, hero carousel, type tabs, recommend list). Used only by the home page when the "播客" tab is active.
+- `PodcastQuickActions.vue`, `PodcastHeroCarousel.vue`, `PodcastTypeTabs.vue`, `PodcastRecommendList.vue` — child components consumed by `PodcastHomePage`.
+- `PodcastSection.vue` — podcast list section embedded in the "我的" page (mine/index.vue).
+- `NotesSection.vue` — notes waterfall section embedded in the "我的" page (mine/index.vue).
 
 ## SideDrawer architecture (critical)
 
@@ -138,6 +142,9 @@ Central mock data file exporting all constants used across pages. Key exports:
 | `playlistDetailMap` | Maps playlist ID → { title, image, desc, playCount, songIds[] }. The playlist page resolves `songIds` against `allSongs` to build its track list. |
 | `mockLyrics` | Timed lyric lines for the full-screen player |
 | `mockMessages` | Message center items with read/unread state |
+| `podcastSubTabs`, `podcastList` | Podcast discovery tab data ("我的" page) |
+| `noteCardList` | Note cards for the "我的" page waterfall section |
+| `podcastQuickActions`, `podcastHeroCards`, `podcastTypeTabs`, `podcastRecommendList` | Podcast home page content (home page 播客 tab, via `PodcastHomePage`) |
 
 ## Login flow
 
@@ -151,9 +158,9 @@ Central mock data file exporting all constants used across pages. Key exports:
 
 | File | Role |
 |------|------|
-| `pages.json` | Route registration (10 pages) and global style (background `#665D5F`, custom nav on all pages) |
-| `manifest.json` | uni-app app manifest (appid `__UNI__305FB91`, platform configs for app-plus/weixin/h5) |
-| `App.vue` | Root component — global CSS reset + **global drawer CSS classes** (non-scoped) + page-fade-in animation |
+| `pages.json` | Route registration (10 pages) and global style (custom nav on all pages) |
+| `manifest.json` | uni-app app manifest (appid `__UNI__305FB91`, version `1.4.0`, `vueVersion: "2"`, platform targets: app-plus/h5/mp-weixin). App-plus uses `compilerVersion: 3` + `usingComponents: true`. Splash screen set to `alwaysShowBeforeRender` + `waiting` — the app must call `plus.navigator.closeSplashscreen()` to dismiss it on App platform (not currently implemented). |
+| `App.vue` | Root component — global CSS reset (box-sizing, button reset, scrollbar hiding), gradient page background, **global drawer CSS classes** (non-scoped), page-fade-in animation, tap feedback, glass-morphism status bar |
 | `main.js` | Vue 2 entry point, no plugins or global config beyond `productionTip = false` |
 | `common/data.js` | All mock data and constants — the single source of truth for the entire app |
 | `common/drawerMixin.js` | **Central drawer logic**: data (`drawerActive`, `drawerMenuItems`), watch, animation (`_animateIn`/`closeDrawer`), event handlers. Used by all 4 main pages. |
@@ -164,6 +171,11 @@ Central mock data file exporting all constants used across pages. Key exports:
 | `pages/playlist/index.vue` | Playlist detail — resolves `songIds` from `playlistDetailMap` against `allSongs`, tap-to-play |
 | `pages/settings/index.vue` | Settings page — logout (clears `LOGIN_KEY`), cache clearing, navigation to profile |
 | `pages/messages/index.vue` | Message center — displays `mockMessages`, mark-all-read, read/unread styling |
+| `pages/mine/index.vue` | Profile page — login state gating, scroll-driven compact header (shows avatar+name when scrolled), tabbed sections for playlists/podcasts/notes. Uses `PodcastSection` and `NotesSection` child components. |
+| `pages/home/index.vue` | Home page — horizontal scrollable tabs (推荐/音乐/播客/听书), conditional rendering: `PodcastHomePage` for 播客 tab, inline cards + song/playlist lists for other tabs. |
+| `components/PodcastHomePage.vue` | Composite podcast tab — assembles `PodcastQuickActions`, `PodcastHeroCarousel`, `PodcastTypeTabs`, `PodcastRecommendList` |
+| `components/PodcastSection.vue` | Podcast list with sub-tab filter — used inside "我的" page |
+| `components/NotesSection.vue` | Notes waterfall section — used inside "我的" page |
 
 ## Styling conventions
 
@@ -191,6 +203,17 @@ created() {
 ```
 
 Pages using this pattern: search, note, mine. (The home page uses `overflow-x: hidden` instead of `overflow: hidden` on `.page` and does not need the CSS variable.)
+
+## Fixed header pattern (search, note, mine)
+
+These three pages place the fixed header **outside** `.page` (as a sibling of `.page`, inside `.page-root`) to avoid `overflow: hidden` clipping. The header is `.header-bar` with `position: fixed` and `z-index: 100`. Content needs a spacer `<view :style="{ height: headerSpacerH + 'px' }">` at the top of the scroll area to prevent overlap. The spacer height = status bar height + 96rpx top bar (converted to px).
+
+The home page uses a different pattern: `.header-fixed` is inside `.page` (which has `overflow-x: hidden`, not `overflow: hidden`).
+
+## Gotchas
+
+- `homeTabs` in `data.js` is **not used** by the home page. The home page defines its own local `tabs` array (`['推荐', '音乐', '播客', '听书']`) which differs from the exported `homeTabs` (`['心动', '推荐', '音乐', '会员大促', '播客']`). The home page's podcast tab conditionally renders `PodcastHomePage` instead of the standard card/song content.
+- `theme` in `data.js` is defined but **not imported by any page** — all colors are hardcoded inline. `panelDark` is completely unused.
 
 ## Default test account
 
@@ -221,6 +244,10 @@ CSS `@keyframes animation` on a `v-if`-mounted element may not trigger on App pl
 ### App platform: will-change creates containing block
 
 `will-change: transform` on any element inside a `position: fixed` container can create a new containing block, breaking fixed positioning on some mobile WebViews. Avoid this property on drawer elements.
+
+### App platform: splash screen never dismissed
+
+The manifest configures `splashscreen: { alwaysShowBeforeRender: true, waiting: true, autoclose: true }`. On App platform, `waiting: true` means the splash screen stays until the app calls `plus.navigator.closeSplashscreen()`. Since `App.vue` does not currently call this, the splash may persist indefinitely on device. If the app appears stuck at the splash screen, add `plus.navigator.closeSplashscreen()` to `App.vue`'s `onLaunch` or `onReady`.
 
 ## Static assets
 
