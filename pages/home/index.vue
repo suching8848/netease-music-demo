@@ -394,21 +394,6 @@ export default {
   box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
 }
 
-.badge {
-  position: absolute;
-  left: 28rpx;
-  top: 4rpx;
-  height: 30rpx;
-  line-height: 30rpx;
-  padding: 0 10rpx;
-  border-radius: 15rpx;
-  background: #ff2d55;
-  color: #fff;
-  font-size: 18rpx;
-  font-weight: 700;
-  box-shadow: 0 2rpx 8rpx rgba(255, 45, 85, 0.4);
-}
-
 .tabs-scroll {
   flex: 1;
   white-space: nowrap;

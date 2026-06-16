@@ -8,17 +8,14 @@ export const STUDENT = {
 // 登录缓存 key 使用新版名称，避免浏览器里残留旧账号信息。
 export const LOGIN_KEY = 'musicFinalLoginUser'
 
-export const theme = {
-  bg: '#665D5F',
-  panel: '#746B6D',
-  panelDark: '#5E5658',
-  text: '#FFFFFF',
-  subText: '#D8D0D1',
-  red: '#FF2D55'
-}
+// @deprecated — theme 未被任何页面引用，所有颜色硬编码在各页 scoped CSS 中
+// export const theme = { ... }
 
-export const homeTabs = ['心动', '推荐', '音乐', '会员大促', '播客']
+// @deprecated — 首页自行定义了本地 tabs: ['推荐','音乐','播客','听书']，不使用此数组
+// export const homeTabs = ['心动', '推荐', '音乐', '会员大促', '播客']
 
+// @deprecated — 首页自行定义本地 topCards/songs/playlists(带 className 渐变背景)，
+// 不使用这些带 image 字段的导出。保留供其他页面可能引用。
 export const homeCards = [
   {
     id: 1,
@@ -272,7 +269,7 @@ export const mockLyrics = [
 export const mockMessages = [
   { id: 1, title: '系统通知', text: '您的歌单「深夜循环歌单」被推荐到首页', time: '10分钟前', read: false, icon: '🔔', iconClass: 'system' },
   { id: 2, title: '歌单更新', text: '「今日私人雷达」已更新，快来听听新歌', time: '2小时前', read: false, icon: '📋', iconClass: 'playlist' },
-  { id: 3, title: '版本更新', text: '云音乐复刻 v1.1.0 已发布，新增全屏播放器', time: '昨天', read: false, icon: '🆕', iconClass: 'update' },
+  { id: 3, title: '版本更新', text: '云音乐复刻 v1.4.0 已发布，新增全屏播放器 + 播客主界面', time: '昨天', read: false, icon: '🆕', iconClass: 'update' },
   { id: 4, title: '活动提醒', text: '周年庆活动进行中，免费天数已发放到您的账户', time: '2天前', read: true, icon: '🎁', iconClass: 'activity' },
   { id: 5, title: '音乐周报', text: '本周您一共听了 127 首歌，总时长 8.4 小时', time: '3天前', read: true, icon: '📊', iconClass: 'notice' }
 ]

@@ -15,6 +15,8 @@ This project has no `package.json`, no Node-based tooling, and no CLI. It is bui
 
 There are no tests, no linters, and no build scripts.
 
+The `.claude/` directory contains Claude Code session settings (e.g., `settings.local.json` with custom permissions). Do not delete this directory.
+
 ## Tech stack
 
 - **Framework**: uni-app (DCloud cross-platform framework targeting H5, WeChat Mini Program, and native App)
@@ -105,6 +107,8 @@ Each page template      ← inline <view v-if="showDrawer" class="drawer-root">�
   <view v-if="showDrawer" class="drawer-root">…</view>
 </view>
 ```
+
+**Important**: `<status-bar>` and `<top-bar>` seen in page templates are **not imported components** — they are just `<view class="status-bar">` and `<view class="top-bar">` elements. The `.status-bar` class is defined globally in `App.vue` (glass-morphism background). The `.top-bar` class is defined per-page in scoped CSS. There are no `status-bar.vue` or `top-bar.vue` component files.
 
 **Critical rules for drawer visibility**:
 1. The drawer element must be a **sibling** of the `overflow: hidden` content container, never inside it
@@ -221,6 +225,8 @@ Defined in `common/data.js`:
 - 学号: `2312505051`, 姓名: `马望轩`, 密码: `123456`
 
 To customize for a different student, edit the `STUDENT` object's `id`, `name`, and `password` fields. The login page has a "一键填入测试账号" button that fills the form from `STUDENT`.
+
+**Version note**: The `README.md` says v1.3.0, but `manifest.json` declares version `1.4.0`. When an accurate version is needed, trust `manifest.json` as the authoritative source.
 
 ## Known platform issues
 

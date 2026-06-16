@@ -51,7 +51,7 @@
       <view class="card">
         <view class="row" @tap="checkUpdate">
           <text class="row-label">检查更新</text>
-          <text class="row-value">v1.1.0</text>
+          <text class="row-value">v1.4.0</text>
           <text class="row-arrow">›</text>
         </view>
         <view class="row">

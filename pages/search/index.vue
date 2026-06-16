@@ -48,7 +48,12 @@
       >
         <image class="result-cover" :src="song.cover" mode="aspectFill" />
         <view class="result-info">
-          <text class="result-name">{{ highlightMatch(song.name) }}</text>
+          <text class="result-name">
+            <block v-for="(seg, i) in highlightSegments(song.name)" :key="i">
+              <text v-if="seg.hl" class="hl">{{ seg.t }}</text>
+              <text v-else>{{ seg.t }}</text>
+            </block>
+          </text>
           <text class="result-singer">{{ song.singer }} · {{ song.album }}</text>
         </view>
         <text class="result-duration">{{ song.duration }}</text>
@@ -242,8 +247,25 @@ export default {
       uni.$emit('playSong', song)
       uni.navigateTo({ url: '/pages/player/index' })
     },
-    highlightMatch(text) {
-      return text
+    highlightSegments(text) {
+      const q = this.searchQuery.trim()
+      if (!q || !text) return [{ t: text || '', hl: false }]
+      // 大小写无关拆分，保留原始大小写
+      const lower = text.toLowerCase()
+      const ql = q.toLowerCase()
+      const parts = []
+      let pos = 0
+      while (pos < text.length) {
+        const idx = lower.indexOf(ql, pos)
+        if (idx === -1) {
+          parts.push({ t: text.slice(pos), hl: false })
+          break
+        }
+        if (idx > pos) parts.push({ t: text.slice(pos, idx), hl: false })
+        parts.push({ t: text.slice(idx, idx + q.length), hl: true })
+        pos = idx + q.length
+      }
+      return parts.length ? parts : [{ t: text, hl: false }]
     },
 
     /* ====== 导航 ====== */
@@ -328,21 +350,6 @@ export default {
   font-weight: 700;
   text-align: center;
   box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.3);
-}
-
-.badge {
-  position: absolute;
-  left: 24rpx;
-  top: -6rpx;
-  height: 32rpx;
-  line-height: 32rpx;
-  background: #ff2d55;
-  color: #fff;
-  font-size: 18rpx;
-  padding: 0 10rpx;
-  border-radius: 16rpx;
-  font-weight: 700;
-  box-shadow: 0 2rpx 8rpx rgba(255, 45, 85, 0.4);
 }
 
 .search-box {
@@ -450,6 +457,9 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.hl {
+  color: #4fc3f7;
 }
 
 .result-singer {
