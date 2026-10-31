@@ -58,7 +58,7 @@ Demo page (development-only, no tab bar entry):
 
 **Shared components** (`components/`):
 - `bottom-tab.vue` — reusable bottom tab bar (accepts `active` prop: `"home"` | `"search"` | `"note"` | `"mine"`). Navigates via `uni.reLaunch`. Used by all four main pages.
-- `mini-player.vue` — fixed bottom mini player with spinning record animation. Used by all pages except login. Displays song info from `playerInfo` in `data.js`, initialized at mount and updated reactively via the `uni.$on('playSong')` event bus. Clicking it navigates to the full-screen player page. Emits `playingChange` events so other components can react to play/pause state.
+- `mini-player.vue` — fixed bottom mini player with spinning record animation. Used by the four main tab pages (home, search, note, mine) and the demo page. Displays song info from `playerInfo` in `data.js`, initialized at mount and updated reactively via the `uni.$on('playSong')` event bus. Clicking it navigates to the full-screen player page. Emits `playingChange` events so other components can react to play/pause state.
 - `SideDrawer/SideDrawer.vue` — left-side slide-out drawer **component** (used only by the demo page `pages/index/index.vue`). On the App platform, this component does NOT work reliably due to uni-app's sub-component rendering isolation (see known issues below).
 - `PodcastHomePage.vue` — composite component that assembles the podcast tab UI (quick actions, hero carousel, type tabs, recommend list). Used only by the home page when the "播客" tab is active.
 - `PodcastQuickActions.vue`, `PodcastHeroCarousel.vue`, `PodcastTypeTabs.vue`, `PodcastRecommendList.vue` — child components consumed by `PodcastHomePage`.
@@ -135,8 +135,7 @@ Central mock data file exporting all constants used across pages. Key exports:
 |--------|---------|
 | `STUDENT` | Default test account (id, name, password) |
 | `LOGIN_KEY` | Storage key for login session (`'musicFinalLoginUser'`) |
-| `theme` | Color palette (bg, panel, panelDark, text, subText, red). Note: `panelDark` is defined but unused across all Vue files; no page actually imports `theme` — colors are hardcoded inline. |
-| `homeTabs`, `homeCards`, `recommendSongs`, `recommendPlaylists` | Home page content |
+| `homeCards`, `recommendSongs`, `recommendPlaylists` | Home page content — **deprecated**: the home page defines its own local `topCards`/`songs`/`playlists` with inline gradient backgrounds instead of these `image`-based exports. Kept in `data.js` for potential future use. |
 | `discoverIcons`, `quickDiscover`, `browseAll` | Search/discover page content |
 | `noteList` | Note cards with varying heights (`h` field) for waterfall layout |
 | `profile`, `myPlaylists` | User profile and playlist data |
@@ -216,8 +215,8 @@ The home page uses a different pattern: `.header-fixed` is inside `.page` (which
 
 ## Gotchas
 
-- `homeTabs` in `data.js` is **not used** by the home page. The home page defines its own local `tabs` array (`['推荐', '音乐', '播客', '听书']`) which differs from the exported `homeTabs` (`['心动', '推荐', '音乐', '会员大促', '播客']`). The home page's podcast tab conditionally renders `PodcastHomePage` instead of the standard card/song content.
-- `theme` in `data.js` is defined but **not imported by any page** — all colors are hardcoded inline. `panelDark` is completely unused.
+- `homeTabs` and `theme` in `data.js` have been **commented out** (`@deprecated`) and are no longer exported. `homeTabs` was never used — the home page defines its own local `tabs` array (`['推荐', '音乐', '播客', '听书']`). `theme` was never imported by any page — all colors are hardcoded inline.
+- `homeCards`, `recommendSongs`, and `recommendPlaylists` are still exported but **unused** — the home page defines its own local card/song/playlist data with inline gradient backgrounds instead. The home page's podcast tab conditionally renders `PodcastHomePage` instead of the standard card/song content.
 
 ## Default test account
 
@@ -225,8 +224,6 @@ Defined in `common/data.js`:
 - 学号: `2312505051`, 姓名: `马望轩`, 密码: `123456`
 
 To customize for a different student, edit the `STUDENT` object's `id`, `name`, and `password` fields. The login page has a "一键填入测试账号" button that fills the form from `STUDENT`.
-
-**Version note**: The `README.md` says v1.3.0, but `manifest.json` declares version `1.4.0`. When an accurate version is needed, trust `manifest.json` as the authoritative source.
 
 ## Known platform issues
 
